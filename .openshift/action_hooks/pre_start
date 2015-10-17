@@ -2,4 +2,5 @@
 
 echo "Killing all python processes..."
 killall -w python
+rm /tmp/HBLauncher.pid
 echo "Killed all python processes."
