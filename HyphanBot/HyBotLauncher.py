@@ -9,7 +9,7 @@ def launchBot(recover=False, prefix=""):
     pidfile = "/tmp/HBLauncher.pid"
 
     if os.path.isfile(pidfile):
-        print "%s already exists, exiting" % pidfile
+        print(pidfile+" already exists, exiting...")
         sys.exit()
     else:
         file(pidfile, 'w').write(pid)
