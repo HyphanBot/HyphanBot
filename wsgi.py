@@ -2,7 +2,7 @@
 import sys
 import os
 sys.path.append(os.path.abspath("HyphanBot/"))
-import HyBotLauncher
+from HyBotLauncher import *
 
 def application(environ, start_response):
 
@@ -297,5 +297,6 @@ $ git push</pre>
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server
     httpd = make_server('localhost', 8051, application)
+    print("Listening on localhost:8051 ...")
     # Wait for a single request, serve it and quit.
     httpd.handle_request()
