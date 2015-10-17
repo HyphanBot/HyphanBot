@@ -2,6 +2,7 @@
 import sys
 import os
 sys.path.append(os.path.abspath("HyphanBot/"))
+import HyBotLauncher
 #from HyBotLauncher import *
 
 def application(environ, start_response):
@@ -290,7 +291,6 @@ $ git push</pre>
     #
     start_response(status, response_headers)
 
-    import HyBotLauncher
     launchBot(False, "HyphanBot/")
 
     return [response_body ]
