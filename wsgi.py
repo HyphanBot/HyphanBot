@@ -291,7 +291,7 @@ $ git push</pre>
     #
     start_response(status, response_headers)
 
-    launchBot(False, "HyphanBot/")
+    #launchBot(False, "HyphanBot/")
 
     return [response_body ]
 
