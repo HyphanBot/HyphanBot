@@ -8,6 +8,7 @@ import random
 from html.parser import HTMLParser
 import bashquotes
 import requests
+import subprocess
 
 def main():
     global isRecovered
@@ -461,6 +462,20 @@ def getMsg(bot):
                     	if not popocmd:
                             bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                             bot.sendMessage(chat_id=chatId, text=getRandomUser(arg1))
+                    popocmd = False
+                elif cmd(b'eval', msg):
+                    arg1 = msg[cmdLen(b'eval', msg)+1:].decode("utf-8")
+                    print("Got command '/eval' with arguments '" + arg1 + "'")
+                    if arg1 == "":
+                        bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                        bot.sendMessage(chat_id=chatId, text="What do you want me to evaluate for you? The format is like this:\n/eval <common_lisp>")
+                    else:
+                    	if popocmd:
+                            bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                            bot.sendMessage(chat_id=chatId, text="Here is your result, maggot.")
+                        bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                        lispOutput = subprocess.Popen(["clisp", "-modern", "-q", "-x", arg1], stdout=subprocess.PIPE).communicate()[0]
+                        bot.sendMessage(chat_id=chatId, text=lispOutput)
                     popocmd = False
                 elif cmd(b'quit', msg):
                     print("Got command '/quit'")
