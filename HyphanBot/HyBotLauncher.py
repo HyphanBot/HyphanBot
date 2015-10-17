@@ -1,8 +1,19 @@
 from subprocess import call
 from time import sleep
-from sys import exit
+import os
+import sys
+
 
 def launchBot(recover=False, prefix=""):
+    pid = str(os.getpid())
+    pidfile = "/tmp/HBLauncher.pid"
+
+    if os.path.isfile(pidfile):
+        print "%s already exists, exiting" % pidfile
+        sys.exit()
+    else:
+        file(pidfile, 'w').write(pid)
+
     if recover:
         botLunch = call("python "+prefix+"HyphanBot.py recover", shell=True)
     else:
@@ -16,8 +27,10 @@ def launchBot(recover=False, prefix=""):
             launchBot(True)
         else:
             print("Bot safely quit.")
-            exit(0)
+            os.unlink(pidfile)
+            sys.exit(0)
         sleep(1)
+    os.unlink(pidfile)
 
 if __name__ == '__main__':
     launchBot(False)
