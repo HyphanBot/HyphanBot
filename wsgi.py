@@ -298,5 +298,6 @@ if __name__ == '__main__':
     from wsgiref.simple_server import make_server
     httpd = make_server('localhost', 8051, application)
     print("Listening on localhost:8051 ...")
+    launchBot(False, "HyphanBot/")
     # Wait for a single request, serve it and quit.
     httpd.handle_request()
