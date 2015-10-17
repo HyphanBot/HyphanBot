@@ -1,6 +1,9 @@
-import sys
-import os
-sys.path.append(os.path.relpath("HyphanBot/"))
-from HyBotLauncher import *
+from subprocess import call
+from time import sleep
+from sys import exit
 
-launchBot(False, "HyphanBot/")
+def main():
+	call("cd HyphanBot/; python HyBotLauncher.py", shell=True)
+
+if __name__ == '__main__':
+	main()
