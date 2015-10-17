@@ -2,7 +2,7 @@
 import sys
 import os
 sys.path.append(os.path.abspath("HyphanBot/"))
-import HyBotLauncher
+#import HyBotLauncher
 #from HyBotLauncher import *
 
 def application(environ, start_response):
