@@ -19,5 +19,5 @@ def launchBot(recover=False, prefix=""):
             exit(0)
         sleep(1)
 
-#if __name__ == '__main__':
-#    launchBot(False)
+if __name__ == '__main__':
+    launchBot(False)
