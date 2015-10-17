@@ -12,7 +12,7 @@ def launchBot(recover=False, prefix=""):
         print(pidfile+" already exists, exiting...")
         sys.exit()
     else:
-        file(pidfile, 'w').write(pid)
+        open(pidfile, 'w').write(pid)
 
     if recover:
         botLunch = call("python "+prefix+"HyphanBot.py recover", shell=True)
