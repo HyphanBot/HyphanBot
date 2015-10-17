@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "Killing all python processes..."
+killall -w python
+echo "Killed all python processes."
