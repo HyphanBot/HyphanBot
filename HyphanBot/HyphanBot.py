@@ -470,7 +470,7 @@ def getMsg(bot):
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         bot.sendMessage(chat_id=chatId, text="What do you want me to evaluate for you? The format is like this:\n/eval <common_lisp>")
                     else:
-                    	if popocmd:
+                        if popocmd:
                             bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                             bot.sendMessage(chat_id=chatId, text="Here is your result, maggot.")
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
