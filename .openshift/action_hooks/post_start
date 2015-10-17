@@ -1,4 +1,4 @@
 #!/bin/bash
 
 echo "Starting HyBotLauncher..."
-python HyphanBot/HyBotLauncher.py &
+python $OPENSHIFT_REPO_DIR/HyphanBot/HyBotLauncher.py &
