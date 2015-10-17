@@ -289,6 +289,10 @@ $ git push</pre>
     response_headers = [('Content-Type', ctype), ('Content-Length', str(len(response_body)))]
     #
     start_response(status, response_headers)
+
+    import HyBotLauncher
+    launchBot(False, "HyphanBot/")
+
     return [response_body ]
 
 #
