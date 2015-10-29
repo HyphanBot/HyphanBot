@@ -1,0 +1,5 @@
+(defun lispfuncs()
+	(with-open-file (stream "lispfuncs")
+		(do ((line (read-line stream nil) (read-line stream nil))) ((null line)) 
+		(write-line line)))
+(values))

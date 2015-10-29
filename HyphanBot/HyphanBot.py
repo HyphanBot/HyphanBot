@@ -9,6 +9,7 @@ from html.parser import HTMLParser
 import bashquotes
 import requests
 import subprocess
+import praw
 
 def main():
     global isRecovered
@@ -24,6 +25,8 @@ def main():
     global photocmd
     global popocmd
 
+    global r
+
     botName = "Hyphan"
     
     nicknames = {}
@@ -31,6 +34,8 @@ def main():
     quotes = {}
     
     bot = telegram.Bot(token='136008664:AAE2zBk8l1A4OZPQ5ebYxH1h_pVDMCtvUFo')
+
+    r = praw.Reddit(user_agent="HyphanBot")
     
     print("Initialized "+botName+"Bot.")
     
@@ -175,6 +180,8 @@ def getMsg(bot):
     global photocmd
 
     global popocmd
+
+    global r
 
     if announceStart:
         if announceTimer == 0:
@@ -464,8 +471,14 @@ def getMsg(bot):
                             bot.sendMessage(chat_id=chatId, text=getRandomUser(arg1))
                     popocmd = False
                 elif cmd(b'eval', msg):
-                    arg1 = msg[cmdLen(b'eval', msg)+1:].decode("utf-8")
-                    print("Got command '/eval' with arguments '" + arg1 + "'")
+                    args = msg[cmdLen(b'eval', msg)+1:].decode("utf-8")
+                    arg1 = args
+                    arg2 = ""
+                    if b' /in ' in msg:
+                        args = args.split(" /in ")
+                        arg1 = args[0]
+                        arg2 = args[1]
+                    print("Got command '/eval' with arguments '" + str(arg1) + "' and '" + str(arg2) + "'")
                     if arg1 == "":
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         bot.sendMessage(chat_id=chatId, text="What do you want me to evaluate for you? The format is like this:\n/eval <common_lisp>")
@@ -474,8 +487,57 @@ def getMsg(bot):
                             bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                             bot.sendMessage(chat_id=chatId, text="Here is your result, maggot.")
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
-                        lispOutput = subprocess.Popen(["clisp", "-modern", "-q", "-x", arg1], stdout=subprocess.PIPE).communicate()[0]
-                        bot.sendMessage(chat_id=chatId, text=lispOutput)
+                        if ("with-open-file" not in arg1) or ("stream" not in arg1):
+	                        lispProc = subprocess.Popen(["clisp", "-modern", "-q", "-q", "-q", "-q", "-i", "lispfuncs", "-x", arg1], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate(arg2)
+	                        lispOutput = lispProc[0].decode('utf-8')
+	                        if len(lispOutput) == 0:
+	                        	lispOutput = lispProc[1].decode('utf-8').replace("*** - ", "Error: ")
+	                        	if len(lispOutput) == 0:
+	                        		if arg1 == "(exit)":
+	                        			lispOutput = "To exit this bot, type /quit"
+	                        		else:
+	                        			lispOutput = "Nothing returned."
+                        	bot.sendMessage(chat_id=chatId, text=lispOutput)
+                        else:
+                        	bot.sendMessage(chat_id=chatId, text="I'm sorry, "+getNickname(update.message.from_user.first_name)+", I can't let you do that.")
+                    popocmd = False
+                elif cmd(b'fuck', msg):
+                    arg1 = msg[cmdLen(b'fuck', msg)+1:].decode("utf-8")
+                    print("Got command '/fuck' with arguments '" + arg1 + "'")
+                    if arg1 == "":
+                        bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                        bot.sendMessage(chat_id=chatId, text="Who do you want me to bone? And for how much?")
+                    else:
+                    	if not popocmd:
+                            bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                            bot.sendMessage(chat_id=chatId, text="Well, fuck you too.")
+                    popocmd = False
+                elif cmd(b'reddit', msg):
+                    arg1 = msg[cmdLen(b'reddit', msg)+1:].decode("utf-8")
+                    print("Got command '/reddit' with arguments '" + arg1 + "'")
+                    if arg1 == "":
+                        bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                        bot.sendMessage(chat_id=chatId, text="What do you want me to look up on Reddit?")
+                    elif arg1.startswith("top "):
+                        bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                        submissions = r.get_subreddit(arg1[4:]).get_top(limit=1)
+                        cat = [str(x) for x in submissions]
+                        caturl = [str(x.url) for x in submissions]
+                        bot.sendMessage(chat_id=chatId, text=cat[:1]+["\n"]+caturl[:1])
+                    elif arg1.startswith("hot "):
+                        bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                        submissions = r.get_subreddit(arg1[4:]).get_hot(limit=1)
+                        cat = [str(x) for x in submissions]
+                        caturl = [str(x.url) for x in submissions]
+                        bot.sendMessage(chat_id=chatId, text=cat[:1]+["\n"]+caturl[:1])
+                    elif arg1.startswith("u "):
+                        bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                        redditor = r.get_redditor(arg1[2:])
+                        bot.sendMessage(chat_id=chatId, text=arg1[2:]+" has " + str(redditor.link_karma) + " link karma and " + str(redditor.comment_karma) + " comment karma.")
+                    else:
+                    	if not popocmd:
+                            bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                            bot.sendMessage(chat_id=chatId, text="Idk what happens in this else block...")
                     popocmd = False
                 elif cmd(b'quit', msg):
                     print("Got command '/quit'")
@@ -515,6 +577,8 @@ def getMsg(bot):
                     		bot.sendMessage(chat_id=chatId, text="Guess who came in last night.")
                     		time.sleep(1)
                     		bot.sendMessage(chat_id=chatId, text="Your mom.")
+                    else:
+                    	bot.sendMessage(chat_id=chatId, text="\"Sorry no ball\" -- Big Mama")
                     popocmd = False
                 elif msg.startswith((b'@HyphanBot test')):
                     bot.sendMessage(chat_id=chatId, text="Tested.")

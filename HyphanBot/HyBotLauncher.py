@@ -24,6 +24,7 @@ def launchBot(recover=False, prefix=""):
             print("Bot Crashed! Restarting in 3 seconds...")
             sleep(3)
             print("Restarting now!")
+            os.unlink(pidfile)
             launchBot(True)
         else:
             print("Bot safely quit.")
