@@ -238,7 +238,7 @@ def getMsg(bot):
             if (msg):
                 print("Recieved '", msg, "' in chat", chatId)
                 if ("popo" in msg.decode('utf-8').lower()):
-w                	bot.sendPhoto(chat_id=chatId, photo="http://img08.deviantart.net/e3f9/i/2010/254/f/1/mr__popo__s_deadly_eyes_by_khmaivietboi-d2yjspi.jpg")
+                	bot.sendPhoto(chat_id=chatId, photo="http://img08.deviantart.net/e3f9/i/2010/254/f/1/mr__popo__s_deadly_eyes_by_khmaivietboi-d2yjspi.jpg")
                 	bot.sendMessage(chat_id=chatId, text="HIII!!")
                 	popocmd = True
                         
