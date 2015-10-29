@@ -107,89 +107,70 @@ def getNickname(firstname):
     # return the nickname
     return nicknames[firstname]
 
-# set someones nickname
+# set someone nickname
 def setNickname(firstname, nickname):
     global nicknames
-    # dump the nickname in a file
+    # put the nickname into a file
     nicknames[firstname] = nickname
     with open("nicknames", 'wb') as nns:
         pickle.dump(nicknames, nns)
 
+# remove a nickname
 def delNickname(firstname):
     global nicknames
     del nicknames[firstname]
     with open("nicknames", 'wb') as nns:
         pickle.dump(nicknames, nns)
 
+# get a quote based on an identifier
 def getQuote(quoteId):
     global quotes
+    # open a file and read the quotes from it
     with open("quotes", 'rb') as qts:
         userquotes = pickle.loads(qts.read())
         quotes = userquotes
+    # if you cannot find a quote with that ID return an error
     if not quoteId in quotes:
         return "Sorry, I cannot find the quote with id of '" + quoteId + "'. You can try creating it by typing: \n/quote add " + quoteId + " q=<QuoteText>"
     return '"'+quotes[quoteId]+'"'
 
+# send a random quote
 def randQuote():
     global quotes
     with open("quotes", 'rb') as qts:
         userquotes = pickle.loads(qts.read())
         quotes = userquotes
+    # pick a random quote from the file
     randKey = random.choice(list(quotes.keys()))
     return '"'+quotes[randKey]+'" ('+randKey+')'
 
+# add a quote
 def setQuote(quoteId, quoteStr):
     global quotes
+    # write a quote to the file
     quotes[quoteId] = quoteStr
     with open("quotes", 'wb') as qts:
         pickle.dump(quotes, qts)
 
+# remove a quote
 def delQuote(quoteId):
     global quotes
     del quotes[quoteId]
     with open("quotes", 'wb') as qts:
         pickle.dump(quotes, qts)
 
+# create a random person
 def getRandomUser(field='name'):
+        # a link to site that generates the user
 	url = "http://nerdyserv.no-ip.org/random-backend.php?for=usr"
 	genseed = requests.get(url+"&prop=seed").text
-	content = requests.get(url+"&prop="+field+"&filter=seed-"+genseed).text
+        # generate the name of the person
+        content = requests.get(url+"&prop="+field+"&filter=seed-"+genseed).text
+        # generate the site with further, random, information on the user
 	seedurl = "http://nerdyserv.no-ip.org/random.html?for=usr&filter=seed-"+genseed+""
 	print(content)
 	print(seedurl)
 	return "" + content + "\n" + seedurl
-
-def getBashQuote():
-    heads = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) \
-          AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64',
-         'Accept': 'text/html,application/xhtml+xml, \
-          application/xml;q=0.9,*/*;q=0.8',
-         'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-         'Accept-Encoding': 'none',
-         'Accept-Language': 'en-US,en;q=0.8',
-         'Connection': 'keep-alive'}
-    
-    found = False
-    html_parser = HTMLParser()
-    while found is not True:
-        current_quote = random.randint(2, 90000)
-        #print current_quote
-        request = urllib.request.Request('http://bash.org/?' + str(current_quote), headers=heads)
-        f = urllib.request.urlopen(request)
-        # read html from url
-        gethtml = f.read()
-        # remove multiple spaces (for better looking results)
-        gethtml = " ".join(gethtml.split())
-        
-        result = gethtml.find('<p class="qt">', 0)
-        if result != -1:
-            found = True
-            first_found = gethtml[result + 14:result + 1400]
-            result2 = first_found.find('</td>', 0)
-            second_found = first_found[0:result2]
-            second_found = "\n".join(second_found.split("<br />"))
-            second_found = "".join(second_found.split("</p>"))
-            return " Link to post: http://bash.org/?" + str(current_quote) + "\n [==========================================]\n " + html_parser.unescape(second_found)
 
 def getMsg(bot):
     global isRecovered
@@ -209,6 +190,7 @@ def getMsg(bot):
 
     global r
 
+    # a simple recursive function to repeats a message X amounts of time.
     if announceStart:
         if announceTimer == 0:
             bot.sendMessage(chat_id=announceToChatId, text=""+announceStr+"")
@@ -218,36 +200,46 @@ def getMsg(bot):
 
     for update in bot.getUpdates(offset=latestUpdateId):
         if latestUpdateId < update.update_id:
+            # use the id of the last use chat. This usually means the chat hyphan got
+            # called from
             chatId = update.message.chat_id
+            # make the msg readable
             msg = update.message.text.encode('utf-8')
-            
-            if isRecovered:
-                #bot.sendMessage(chat_id=chatId, text="I just recovered from a crash, sorry about that...")
-                pass
 
+            # print an error if hyphan crashed
+            if isRecovered:
+                print "I just recovered from a crash, sorry about that..."
+
+            # if photocmd is set either send a photo or sticker
             if photocmd:
                 if update.message.photo:
                     print(update.message.photo)
                     bot.sendPhoto(chat_id=photoToChatId, photo=update.message.photo[-1].file_id)
                     photocmd = False
+                    
                 elif update.message.sticker:
                     print(update.message.sticker)
                     bot.sendSticker(chat_id=photoToChatId, sticker=update.message.sticker.file_id)
                     photocmd = False
 
             if (msg):
+                # print the command hyphan received
                 print("Recieved '", msg, "' in chat", chatId)
+
+                # if the command is popo send a photo
                 if ("popo" in msg.decode('utf-8').lower()):
 w                	bot.sendPhoto(chat_id=chatId, photo="http://img08.deviantart.net/e3f9/i/2010/254/f/1/mr__popo__s_deadly_eyes_by_khmaivietboi-d2yjspi.jpg")
                 	bot.sendMessage(chat_id=chatId, text="HIII!!")
                 	popocmd = True
-                        
+
+                # return nothing
                 elif cmd(b'help', msg):
                     print("Got command '/help'")
                     if not popocmd:
                         bot.sendMessage(chat_id=chatId, text="?")
                     popocmd = False
-                    
+
+                # send an about message if someone ask for it
                 elif cmd(b'about', msg):
                     print("Got command '/about'")
                     if not popocmd:
@@ -255,20 +247,25 @@ w                	bot.sendPhoto(chat_id=chatId, photo="http://img08.deviantart.n
                         time.sleep(1)
                         bot.sendMessage(chat_id=chatId, text="I am King "+botName+", ruler of the northern part of the galaxy.")
                     popocmd = False
-                    
+
+                # send a duckduckgo search with a specified keyword
                 elif cmd(b'duckgo', msg):
                     arg1 = urllib.parse.quote_plus(msg[cmdLen(b'duckgo', msg)+1:].decode("utf-8"))
+                    # if no keyword is supplied ask for one
                     print("Got command '/duckgo' with argument '" + arg1 + "'")
                     if arg1 == "":
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         time.sleep(1)
                         bot.sendMessage(chat_id=chatId, text="What do you want me to look up?")
+                    # if a keyword is supplied return a duckduckgo search link
                     else:
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         time.sleep(1)
                         bot.sendMessage(chat_id=chatId, text="Here you go, " + getNickname(update.message.from_user.first_name) + ": https://duckduckgo.com/?q=" + arg1)
                     popocmd = False
-                    
+
+                # a bit more complicated version of duckgo. It gets the first results
+                # of a duckduckgo search and return it. 
                 elif cmd(b'webfetch', msg):
                     arg1 = msg[cmdLen(b'webfetch', msg)+1:].decode("utf-8")
                     print("Got command '/webfetch' with argument '" + arg1 + "'")
@@ -281,7 +278,8 @@ w                	bot.sendPhoto(chat_id=chatId, photo="http://img08.deviantart.n
                         searchResult = duckduckgo.get_zci(arg1)
                         bot.sendMessage(chat_id=chatId, text=getNickname(update.message.from_user.first_name) + ", here is what I can gather about '" + arg1 + "':\n" + searchResult)
                     popocmd = False
-                    
+
+                # ask hyphan a question
                 elif cmd(b'ask', msg):
                     arg1 = msg[cmdLen(b'ask', msg)+1:].decode("utf-8")
                     print("Got command '/ask' with argument '" + arg1 + "'")
