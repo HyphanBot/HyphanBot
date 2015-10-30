@@ -46,7 +46,7 @@ def main():
     r = praw.Reddit(user_agent="HyphanBot")
 
     # print a message for debugging
-    print("Initialized "+botName+"Bot.")
+    print("Initialized "+ botName +"Bot.")
 
     # Try to use the latest ID
     try:
@@ -600,9 +600,18 @@ def getMsg(bot):
 
                 # create a random person and post the link into the chat
                 elif cmd(b'randomuser', msg):
-                    bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
-                    bot.sendMessage(chat_id=chatId, text=getRandomUser('HyphanBot'))
-                    popocmd = False
+                    arg1 = msg[cmdLen(b'randomuser', msg) + 1:].decode("utf-8")
+                    command = "Got command 'randomuser' with the argument '{}'".format(arg1)
+                    print(command)
+
+                    if arg1 == "":
+                        bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                        bot.sendMessage(chat_id=chatId, text=getRandomUser())
+                    else:
+                        if not popocmd:
+                            bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                            bot.sendMessage(chat_id=chatId, text=getRandomUser(arg1))
+                        popocmd = False
 
                 # run some lisp code
                 elif cmd(b'eval', msg):
@@ -791,7 +800,7 @@ def getMsg(bot):
                             bot.sendMessage(chat_id=chatId, text="See ya!")
                         else:
                             bot.sendMessage(chat_id=chatId, text="NOW BYYYEE!!!")
-                        sys.exit(0)
+                        sys.exit(1)
                     else:
                         if not popocmd:
                             bot.sendMessage(chat_id=chatId, text="Bitch, you don't tell me what to do!")
