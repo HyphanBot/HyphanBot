@@ -15,6 +15,8 @@ from hackernews import HackerNews
 from html.parser import HTMLParser
 
 def main():
+    # make the variables so they can be used in different functions then he one they got their
+    # value assigned in
     global isRecovered
     global botName
     global latestUpdateId
