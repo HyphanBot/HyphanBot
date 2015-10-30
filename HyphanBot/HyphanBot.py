@@ -736,7 +736,7 @@ def getMsg(bot):
                             number = number - 1
                             title = titles.pop(number)
                             url = urls.pop(number)
-                            story = title + ": \n\n" + url
+                            story = title + ": \n" + url
                             bot.sendMessage(chat_id=chatId, text=story)
 
                 # hackernews posts
@@ -766,7 +766,7 @@ def getMsg(bot):
                     while number > 0:
                         number  = number - 1
                         storys = hn.item(stories.pop(number))
-                        story = storys.title + ": \n\n" + storys.url
+                        story = storys.title + ": \n" + storys.url
                         bot.sendMessage(chat_id=chatId, text=story)
                                         
                 # quit the bot. 
