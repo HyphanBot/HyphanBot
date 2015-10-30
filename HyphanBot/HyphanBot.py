@@ -361,7 +361,7 @@ def getMsg(bot):
                                 bot.sendMessage(chat_id=chatId, text="Go suck a duck, Maxi.")
                             else:
                                 bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
-                                # make a database of the possibel answers
+                                # make a database of the possible answers
                                 magicMsgs = ["It is certain"," It is decidedly so","Without a doubt","Yes definitely","You may rely on it","As I see it yes","Most likely","Outlook good","Yes","Signs point to yes","Reply hazy try again","Ask again later","Better not tell you now","Cannot predict now","Concentrate and ask again","Don't count on it","My reply is no","God says no","Very doubtful","Outlook not so good"]
                                 
                                 # pick a random answer from the list
@@ -618,7 +618,7 @@ def getMsg(bot):
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         bot.sendMessage(chat_id=chatId, text="What do you want me to evaluate for you? The format is like this:\n/eval <common_lisp>")
                     else:
-                        # reply differnet if hyphan is popo
+                        # reply differently if hyphan is pretending to be Popo again
                         if popocmd:
                             bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                             bot.sendMessage(chat_id=chatId, text="Here is your result, maggot.")
@@ -703,49 +703,41 @@ def getMsg(bot):
                         # Grab some submissions from reddit
                         r = praw.Reddit(user_agent='HyphanBot')
 
-                        length = len(args)
-
-                        if length == 2:
+                        if len(args) == 2:
                             if args[1] == "top":
                                 submissions = r.get_subreddit(args[0]).get_top(limit=5)
                             elif args[1] == "new":
                                 submissions = r.get_subreddit(args[0]).get_new(limit=5)
                             else:
                                 submissions = r.get_subreddit(args[0]).get_hot(limit=5)
+
+                            number = 5
+                        elif len(args) == 3:
+                            number = args[2]
+                            number_check = number.isdigit()
+                            number = int(number)
+
+                            if args[1] == "top":
+                                submissions = r.get_subreddit(args[0]).get_top(limit=number)
+                            elif args[1] == "new":
+                                submissions = r.get_subreddit(args[0]).get_top(limit=number)
+                            else:
+                                submissions = r.get_subreddit(args[0]).get_hot(limit=number)
                         else:
                             submissions = r.get_subreddit(arg1).get_hot(limit=5)
-
+                            number = 5
+                            
                         # grab the titles from the submissions
                         submission = [x for x in submissions]
-                        cat = [str(x) for x in submission]
-                        
-                        # set the titles of the submissions on Reddit
-                        title1 = cat[:1]
-                        title2 = cat[1:2]
-                        title3 = cat[2:3]
-                        title4 = cat[3:4]
-                        title5 = cat[4:]
-                        
-                        cat = [str(x.url) for x in submission]
+                        titles = [str(x) for x in submission]
+                        urls = [str(x.url) for x in submission]                        
 
-                        url1 = cat[:1]
-                        url2 = cat[1:2]
-                        url3 = cat[2:3]
-                        url4 = cat[3:4]
-                        url5 = cat[4:]
-
-                        # put the urls and titles together with some added rice
-                        post1 = ''.join(title1) + '\n [================================================] \n' + ''.join(url1)
-                        post2 = ''.join(title2) + '\n [================================================] \n' + ''.join(url2)
-                        post3 = ''.join(title3) + '\n [================================================] \n' + ''.join(url3)
-                        post4 = ''.join(title4) + '\n [================================================] \n' + ''.join(url4)
-                        post5 = ''.join(title5) + '\n [================================================] \n' + ''.join(url5)
-
-                        bot.sendMessage(chat_id=chatId, text=post1)
-                        bot.sendMessage(chat_id=chatId, text=post2)
-                        bot.sendMessage(chat_id=chatId, text=post3)
-                        bot.sendMessage(chat_id=chatId, text=post4)
-                        bot.sendMessage(chat_id=chatId, text=post5)
+                        while number > 0:
+                            number = number - 1
+                            title = titles.pop(number)
+                            url = urls.pop(number)
+                            story = title + ": \n\n" + url
+                            bot.sendMessage(chat_id=chatId, text=story)
 
                 # hackernews posts
                 elif cmd(b'hackernews', msg):
@@ -774,7 +766,7 @@ def getMsg(bot):
                     while number > 0:
                         number  = number - 1
                         storys = hn.item(stories.pop(number))
-                        story = storys.title + ": \n [=================================================] \n" + storys.url
+                        story = storys.title + ": \n\n" + storys.url
                         bot.sendMessage(chat_id=chatId, text=story)
                                         
                 # quit the bot. 
