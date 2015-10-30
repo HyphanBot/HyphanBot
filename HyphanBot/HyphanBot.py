@@ -161,12 +161,14 @@ def delQuote(quoteId):
 
 # create a random person
 def getRandomUser(field='name'):
-        # a link to site that generates the user
+	# a link to site that generates the user
 	url = "http://nerdyserv.no-ip.org/random-backend.php?for=usr"
 	genseed = requests.get(url+"&prop=seed").text
-        # generate the name of the person
-        content = requests.get(url+"&prop="+field+"&filter=seed-"+genseed).text
-        # generate the site with further, random, information on the user
+
+	# get the name of the person from the generated seed
+	content = requests.get(url+"&prop="+field+"&filter=seed-"+genseed).text
+
+	# generate the site with further, random, information on the user
 	seedurl = "http://nerdyserv.no-ip.org/random.html?for=usr&filter=seed-"+genseed+""
 	print(content)
 	print(seedurl)
@@ -208,7 +210,7 @@ def getMsg(bot):
 
             # print an error if hyphan crashed
             if isRecovered:
-                print "I just recovered from a crash, sorry about that..."
+                print("I just recovered from a crash, sorry about that...")
 
             # if photocmd is set either send a photo or sticker
             if photocmd:
