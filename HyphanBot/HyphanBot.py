@@ -835,6 +835,8 @@ def getMsg(bot):
                         r = praw.Reddit(user_agent='HyphanBot')
 
                         if len(args) == 2:
+                            number = 5
+                                                        
                             if args[1] == "top":
                                 submissions = r.get_subreddit(args[0]).get_top(limit=5)
                             elif args[1] == "new":
@@ -845,8 +847,6 @@ def getMsg(bot):
                             else:
                                 submissions = r.get_subreddit(args[0]).get_hot(limit=5)
 
-                            number = 5
-                            
                         elif len(args) == 3:
                             number = args[2]
                             number_check = number.isdigit()
