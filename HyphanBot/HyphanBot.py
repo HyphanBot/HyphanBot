@@ -831,7 +831,6 @@ def getMsg(bot):
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         bot.sendMessage(chat_id=chatId, text="Please add a subreddit you want to look at!")
                     else:
-<<<<<<< HEAD
                         # Grab some submissions from reddit
                         r = praw.Reddit(user_agent='HyphanBot')
 
@@ -844,6 +843,7 @@ def getMsg(bot):
                                 submissions = r.get_subreddit(args[0]).get_hot(limit=5)
 
                             number = 5
+                            
                         elif len(args) == 3:
                             number = args[2]
                             number_check = number.isdigit()
