@@ -361,7 +361,7 @@ def getMsg(bot):
                         if chatId < 0: # If the chat ID is less than 0 (aka negative number), it's a group chat, otherwise it's not.
                             args = arg1.split(" ") # To insure that no spaces will be registered
                             if not getShortChatName(chatId) and addRegKey(args[0], chatId):
-                                message = "Registered group chat with {}.").format(args[0])
+                                message = "Registered group chat with {}.".format(args[0])
                                 bot.sendMessage(chat_id=chatId, text=message)
                             else:
                                 if not getShortChatName(chatId):
