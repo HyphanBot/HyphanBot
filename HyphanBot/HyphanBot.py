@@ -759,22 +759,6 @@ def getMsg(bot):
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         # only do the command if it's not stream or with-open-file
                         if ("with-open-file" not in arg1) or ("stream" not in arg1):
-<<<<<<< HEAD
-                                # run a the command in clisp in quiet, modern batch mode. It also loads
-                                # the lisp file lispfuncs.lisp
-	                        lispProc = subprocess.Popen(["clisp", "-modern", "-q", "-q", "-q", "-q", "-i", "lispfuncs.lisp", "-x", arg1], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate(arg2)
-	                        lispOutput = lispProc[0].decode('utf-8')
-                                # if the output is error (only happens if it errors) return the error
-	                        if len(lispOutput) == 0:
-                                        # replace the default '***' in clisp error codes with Error:
-	                        	lispOutput = lispProc[1].decode('utf-8').replace("*** - ", "Error: ")
-	                        	if len(lispOutput) == 0:
-	                        		if arg1 == "(exit)":
-	                        			lispOutput = "To exit this bot, type /quit"
-	                        		else:
-	                        			lispOutput = "Nothing returned."
-                        	bot.sendMessage(chat_id=chatId, text=lispOutput)
-=======
                             lispProc = subprocess.Popen(["clisp", "-modern", "-q", "-q", "-q", "-q", "-i", "lispfuncs", "-x", arg1], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate(arg2)
                             #lispProc = subprocess.Popen(["clisp", "-modern", "-q", "-i", "lispfuncs", "-x", arg1], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate(arg2)
                             lispOutput = lispProc[0].decode('utf-8')
@@ -786,7 +770,6 @@ def getMsg(bot):
                                     else:
                                         lispOutput = "Nothing returned."
                             bot.sendMessage(chat_id=chatId, text=lispOutput)
->>>>>>> upstream/master
                         else:
                             bot.sendMessage(chat_id=chatId, text="I'm sorry, "+getNickname(update.message.from_user.first_name)+", I can't let you do that.")
                     popocmd = False
