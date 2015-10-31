@@ -564,7 +564,7 @@ def getMsg(bot):
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         bot.sendMessage(chat_id=chatId, text="What quote do you want me to find or add? Possible formats:\n/quote <QuoteIdentifier>\n/quote add <QuoteIdentifier> q=<QuoteText>\n/quote random")
                     # try to add one if the keyword add is added
-a                    elif arg1.startswith("add"):
+                    elif arg1.startswith("add"):
                     	if arg1[4:] == "":
                     		bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                     		bot.sendMessage(chat_id=chatId, text="What quote do you want me to add? Format:\n/quote add <QuoteIdentifier> q=<QuoteText>")
