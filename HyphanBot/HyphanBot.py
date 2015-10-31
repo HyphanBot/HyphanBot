@@ -1,5 +1,6 @@
 # Import modules for use in hyphan
 import sys
+import os
 import telegram
 import time
 import urllib
@@ -21,6 +22,7 @@ def main():
 
     global nicknames
     global quotes
+    global registry
 
     global announceTimer
     global announceStart
@@ -38,6 +40,9 @@ def main():
 
     # same but for quotes
     quotes = {}
+
+    # Registry for chat IDs
+    registry = {}
 
     # authenticate as hyphan to the telegram bot API
     bot = telegram.Bot(token='136008664:AAE2zBk8l1A4OZPQ5ebYxH1h_pVDMCtvUFo')
@@ -107,6 +112,13 @@ def getNickname(firstname):
     # return the nickname
     return nicknames[firstname]
 
+# remove a nickname
+def delNickname(firstname):
+    global nicknames
+    del nicknames[firstname]
+    with open("nicknames", 'wb') as nns:
+        pickle.dump(nicknames, nns)
+
 # set someone nickname
 def setNickname(firstname, nickname):
     global nicknames
@@ -115,12 +127,43 @@ def setNickname(firstname, nickname):
     with open("nicknames", 'wb') as nns:
         pickle.dump(nicknames, nns)
 
-# remove a nickname
-def delNickname(firstname):
-    global nicknames
-    del nicknames[firstname]
-    with open("nicknames", 'wb') as nns:
-        pickle.dump(nicknames, nns)
+# get the chat id from the shortname
+def getRegistry(shortname):
+    global registry
+    with open("database", 'rb') as db:
+        databaseFile = pickle.loads(db.read())
+        registry = databaseFile
+    if not shortname in registry:
+        return False
+    return registry[shortname]
+
+# get the shortname from the chat id
+def getShortChatName(chatid):
+    global registry
+    if os.path.isfile("database"):
+        with open("database", 'rb') as db:
+            databaseFile = pickle.loads(db.read())
+            registry = databaseFile
+    returned = False
+    for shortname, chatidIter in registry.items():
+        if chatidIter == chatid:
+            returned = shortname
+    return returned
+
+# add key to registry
+def addRegKey(shortname, chatid):
+    global registry
+    if os.path.isfile("database"):
+        with open("database", 'rb') as db:
+            databaseFile = pickle.loads(db.read())
+            registry = databaseFile
+    if not shortname in registry:
+        registry[shortname] = chatid
+        with open("database", 'wb') as db:
+            pickle.dump(registry, db)
+        return True
+    else:
+        return False
 
 # get a quote based on an identifier
 def getQuote(quoteId):
@@ -161,18 +204,18 @@ def delQuote(quoteId):
 
 # create a random person
 def getRandomUser(field='name'):
-	# a link to site that generates the user
-	url = "http://nerdyserv.no-ip.org/random-backend.php?for=usr"
-	genseed = requests.get(url+"&prop=seed").text
+    # a link to site that generates the user
+    url = "http://nerdyserv.no-ip.org/random-backend.php?for=usr"
+    genseed = requests.get(url+"&prop=seed").text
 
-	# get the name of the person from the generated seed
-	content = requests.get(url+"&prop="+field+"&filter=seed-"+genseed).text
+    # get the name of the person from the generated seed
+    content = requests.get(url+"&prop="+field+"&filter=seed-"+genseed).text
 
-	# generate the site with further, random, information on the user
-	seedurl = "http://nerdyserv.no-ip.org/random.html?for=usr&filter=seed-"+genseed+""
-	print(content)
-	print(seedurl)
-	return "" + content + "\n" + seedurl
+    # generate the site with further, random, information on the user
+    seedurl = "http://nerdyserv.no-ip.org/random.html?for=usr&filter=seed-"+genseed+""
+    print(content)
+    print(seedurl)
+    return "" + content + "\n" + seedurl
 
 def getMsg(bot):
     global isRecovered
@@ -230,9 +273,9 @@ def getMsg(bot):
 
                 # if the command is popo send a photo
                 if ("popo" in msg.decode('utf-8').lower()):
-                	bot.sendPhoto(chat_id=chatId, photo="http://img08.deviantart.net/e3f9/i/2010/254/f/1/mr__popo__s_deadly_eyes_by_khmaivietboi-d2yjspi.jpg")
-                	bot.sendMessage(chat_id=chatId, text="HIII!!")
-                	popocmd = True
+                    bot.sendPhoto(chat_id=chatId, photo="http://img08.deviantart.net/e3f9/i/2010/254/f/1/mr__popo__s_deadly_eyes_by_khmaivietboi-d2yjspi.jpg")
+                    bot.sendMessage(chat_id=chatId, text="HIII!!")
+                    popocmd = True
 
                 # return nothing
                 elif cmd(b'help', msg):
@@ -298,20 +341,83 @@ def getMsg(bot):
                             bot.sendMessage(chat_id=chatId, text=searchResult.answer.text)
                     popocmd = False
                     
-                elif cmd(b'callme', msg):
-                    arg1 = msg[cmdLen(b'callme', msg)+1:].decode("utf-8")
-                    print("Got command '/callme' with argument '" + arg1 + "'")
+                # Registers a chat id with a username or, if used in a group chat, a short name.
+                elif cmd(b'register', msg):
+                    arg1 = msg[cmdLen(b'register', msg)+1:].decode("utf-8")
+                    print("Got command '/register' with argument '" + arg1 + "'")
                     if arg1 == "":
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
-                        time.sleep(1)
-                        bot.sendMessage(chat_id=chatId, text="What do you want me to call you, " + getNickname(update.message.from_user.first_name) + "?")
+                        if chatId < 0:
+                            bot.sendMessage(chat_id=chatId, text="This is a group chat. What name do you want me to register it under? No spaces please! Format:\n/register <shortname>")
+                        else:
+                            if addRegKey(update.message.from_user.username, chatId):
+                                bot.sendMessage(chat_id=chatId, text="Registered chat with '"+update.message.from_user.username+"' (your username)")
+                            else:
+                                bot.sendMessage(chat_id=chatId, text="This chat is already registered with your username ("+update.message.from_user.username+").")
                     else:
-                    	if not popocmd:
-                            bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
-                            setNickname(update.message.from_user.first_name, arg1)
-                            bot.sendMessage(chat_id=chatId, text="From now on, I'll start calling you " + getNickname(update.message.from_user.first_name) + ".")
+                        bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                        if chatId < 0: # If the chat ID is less than 0 (aka negative number), it's a group chat, otherwise it's not.
+                            args = arg1.split(" ") # To insure that no spaces will be registered
+                            if not getShortChatName(chatId) and addRegKey(args[0], chatId):
+                                bot.sendMessage(chat_id=chatId, text="Registered group chat with '"+args[0]+"'.")
+                            else:
+                                if not getShortChatName(chatId):
+                                    bot.sendMessage(chat_id=chatId, text="This shortname ("+args[0]+") is already registered to another chat.")
+                                else:
+                                    bot.sendMessage(chat_id=chatId, text="This group chat is already registered with '"+getShortChatName(chatId)+"'.")
                     popocmd = False
                     
+                # To test the register command.
+                elif cmd(b'chatid', msg):
+                    arg1 = msg[cmdLen(b'chatid', msg)+1:].decode("utf-8")
+                    print("Got command '/chatid' with argument '" + arg1 + "'")
+                    if arg1 == "":
+                        bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                        # This is more of an informational message than an error.
+                        bot.sendMessage(chat_id=chatId, text="The ID for this chat is: "+str(chatId)+"\nWhich chat ID do you want me to look up? Format:\n/chatid <shortname>")
+                    else:
+                        bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                        requestedChatId = getRegistry(arg1)
+                        if requestedChatId:
+                            bot.sendMessage(chat_id=chatId, text="The registered chat ID for '"+arg1+"' is: "+str(requestedChatId))
+                        else:
+                            bot.sendMessage(chat_id=chatId, text="There is no registered chat ID assosiated with this name.\nTo register a chat with me under this name, use one of the folowing commands:\nIn private chat: /register\nIn group chats: /register "+arg1)
+                    popocmd = False
+
+                # Send a private message to someone through Hyphan.
+                elif cmd(b'pm', msg):
+                    arg1 = msg[cmdLen(b'pm', msg)+1:].decode("utf-8")
+                    print("Got command '/pm' with argument '" + arg1 + "'")
+                    if arg1 == "":
+                        bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                        bot.sendMessage(chat_id=chatId, text="Who do you want me to send a message to? Format:\n/pm <username> <message>")
+                    else:
+                        bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                        args = arg1.split(" ")
+                        if len(args) == 1:
+                            if getRegistry(args[0]):
+                                bot.sendMessage(chat_id=chatId, text="What message do you want me to send to "+args[0]+"? Format:\n/pm "+args[0]+" <message>")
+                            else:
+                                bot.sendMessage(chat_id=chatId, text="Sorry to tell you this, but the user you're trying to send a message to is not registered with me.\nWho else do you want me to send a message to? Format:\n/pm <username> <message>")
+                        else:
+                            recipientId = getRegistry(args[0])
+                            if recipientId:
+                                if recipientId > 0:
+                                    unsorted = args[1:]
+                                    pmsg = ""
+                                    for x in unsorted:
+                                        pmsg = pmsg + " " + x
+                                    bot.sendMessage(chat_id=recipientId, text="PM from "+update.message.from_user.first_name+" ("+update.message.from_user.username+"):\n" + pmsg + "\n[To reply to this message, use: /pm "+update.message.from_user.username+" <your reply> ]")
+                                else:
+                                    bot.sendMessage(chat_id=chatId, text="Sorry, I can't send a private message to a group.")
+                            else:
+                                bot.sendMessage(chat_id=chatId, text="Sorry to tell you this, but the user you're trying to send a message to is not registered with me.")
+                    popocmd = False
+
+                # This command is used only for initialising the database file
+                #elif cmd(b'mkdb', msg):
+                #    addRegKey("testkey", 1234)
+
                 elif cmd(b'nonick', msg):
                     print("Got command '/nonick'")
                     if getNickname(update.message.from_user.first_name) == update.message.from_user.first_name:
@@ -333,7 +439,21 @@ def getMsg(bot):
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         bot.sendMessage(chat_id=chatId, text="You're " + getNickname(update.message.from_user.first_name) + ", or so I call you.")
                     popocmd = False
-                    
+                
+                elif cmd(b'callme', msg):
+                    arg1 = msg[cmdLen(b'callme', msg)+1:].decode("utf-8")
+                    print("Got command '/callme' with argument '" + arg1 + "'")
+                    if arg1 == "":
+                        bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                        time.sleep(1)
+                        bot.sendMessage(chat_id=chatId, text="What do you want me to call you, " + getNickname(update.message.from_user.first_name) + "?")
+                    else:
+                        if not popocmd:
+                            bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                            setNickname(update.message.from_user.first_name, arg1)
+                            bot.sendMessage(chat_id=chatId, text="From now on, I'll start calling you " + getNickname(update.message.from_user.first_name) + ".")
+                    popocmd = False
+
                 elif cmd(b'magic8', msg) or cmd(b'8', msg):
                     if cmd(b'magic8', msg):
                         arg1 = msg[cmdLen(b'magic8', msg)+1:].decode("utf-8")
@@ -362,7 +482,7 @@ def getMsg(bot):
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         bot.sendMessage(chat_id=chatId, text="What do you want me to say after 5 seconds?")
                     else:
-                    	if not popocmd:
+                        if not popocmd:
                             time.sleep(5)
                             bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                             bot.sendMessage(chat_id=chatId, text="" + arg1 + "")
@@ -400,7 +520,7 @@ def getMsg(bot):
                         if not popocmd:
                             bot.sendMessage(chat_id=chatId, text=""+possibilities[choice]+"")
                         else:
-                        	bot.sendMessage(chat_id=chatId, text="Lord Popo.")
+                            bot.sendMessage(chat_id=chatId, text="Lord Popo.")
                     popocmd = False
                     
                 elif cmd(b'quote', msg):
@@ -412,18 +532,18 @@ def getMsg(bot):
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         bot.sendMessage(chat_id=chatId, text="What quote do you want me to find or add? Possible formats:\n/quote <QuoteIdentifier>\n/quote add <QuoteIdentifier> q=<QuoteText>\n/quote random")
                     elif arg1.startswith("add"):
-                    	if arg1[4:] == "":
-                    		bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
-                    		bot.sendMessage(chat_id=chatId, text="What quote do you want me to add? Format:\n/quote add <QuoteIdentifier> q=<QuoteText>")
-                    	else:
-                    		addargs = arg1[4:].split(" q=")
-                    		if not addargs[1]:
-                    			bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
-                    			bot.sendMessage(chat_id=chatId, text="What quote do you want me to add? Format:\n/quote add "+arg2+" q=<QuoteText>")
-                    		else:
-                    			setQuote(addargs[0], addargs[1])
-                    			bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
-                    			bot.sendMessage(chat_id=chatId, text="Added quote with id of '"+addargs[0]+"'.")
+                        if arg1[4:] == "":
+                            bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                            bot.sendMessage(chat_id=chatId, text="What quote do you want me to add? Format:\n/quote add <QuoteIdentifier> q=<QuoteText>")
+                        else:
+                            addargs = arg1[4:].split(" q=")
+                            if not addargs[1]:
+                                bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                                bot.sendMessage(chat_id=chatId, text="What quote do you want me to add? Format:\n/quote add "+arg2+" q=<QuoteText>")
+                            else:
+                                setQuote(addargs[0], addargs[1])
+                                bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                                bot.sendMessage(chat_id=chatId, text="Added quote with id of '"+addargs[0]+"'.")
                                         
                     elif arg1.startswith("random"):
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
@@ -435,8 +555,8 @@ def getMsg(bot):
                     popocmd = False
                     
                 elif cmd(b'mkquotes', msg):
-                	#setQuote("test", "This is a test quote.")
-                	bot.sendMessage(chat_id=chatId, text="This command does nothing now.")
+                    #setQuote("test", "This is a test quote.")
+                    bot.sendMessage(chat_id=chatId, text="This command does nothing now.")
                         
                 elif cmd(b'stopannounce', msg) or cmd(b'announcestop', msg):
                     print("Got command '/stopannounce'")
@@ -458,15 +578,15 @@ def getMsg(bot):
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         bot.sendMessage(chat_id=chatId, text="Get? What do you want me to 'get'?")
                     elif ("lemonade" in arg1) and ("not" not in arg1) and ("don't" not in arg1):
-                    	if not popocmd:
+                        if not popocmd:
                             bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                             bot.sendMessage(chat_id=chatId, text="Sorry, I don't have any lemonade. Go ask THBot to get you some... Oh wait, he's dead..")
                     elif ("lemonade" in arg1) and (("not" in arg1) or ("don't" in arg1)):
-                    	if not popocmd:
+                        if not popocmd:
                             bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                             bot.sendMessage(chat_id=chatId, text="Um... Ok.")
                     else:
-                    	if not popocmd:
+                        if not popocmd:
                             bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                             bot.sendMessage(chat_id=chatId, text="I don't know how to get that..")
                     popocmd = False
@@ -503,7 +623,7 @@ def getMsg(bot):
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         bot.sendMessage(chat_id=chatId, text="What do you want me to spoil for you? The format is like this:\n/spoil <story_title>")
                     else:
-                    	if not popocmd:
+                        if not popocmd:
                             bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                             bot.sendMessage(chat_id=chatId, text="Everybody dies at the end.")
                     popocmd = False
@@ -515,7 +635,7 @@ def getMsg(bot):
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         bot.sendMessage(chat_id=chatId, text=getRandomUser())
                     else:
-                    	if not popocmd:
+                        if not popocmd:
                             bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                             bot.sendMessage(chat_id=chatId, text=getRandomUser(arg1))
                     popocmd = False
@@ -538,18 +658,19 @@ def getMsg(bot):
                             bot.sendMessage(chat_id=chatId, text="Here is your result, maggot.")
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         if ("with-open-file" not in arg1) or ("stream" not in arg1):
-	                        lispProc = subprocess.Popen(["clisp", "-modern", "-q", "-q", "-q", "-q", "-i", "lispfuncs", "-x", arg1], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate(arg2)
-	                        lispOutput = lispProc[0].decode('utf-8')
-	                        if len(lispOutput) == 0:
-	                        	lispOutput = lispProc[1].decode('utf-8').replace("*** - ", "Error: ")
-	                        	if len(lispOutput) == 0:
-	                        		if arg1 == "(exit)":
-	                        			lispOutput = "To exit this bot, type /quit"
-	                        		else:
-	                        			lispOutput = "Nothing returned."
-                        	bot.sendMessage(chat_id=chatId, text=lispOutput)
+                            lispProc = subprocess.Popen(["clisp", "-modern", "-q", "-q", "-q", "-q", "-i", "lispfuncs", "-x", arg1], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate(arg2)
+                            #lispProc = subprocess.Popen(["clisp", "-modern", "-q", "-i", "lispfuncs", "-x", arg1], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate(arg2)
+                            lispOutput = lispProc[0].decode('utf-8')
+                            if len(lispOutput) == 0:
+                                lispOutput = lispProc[1].decode('utf-8').replace("*** - ", "Error: ")
+                                if len(lispOutput) == 0:
+                                    if arg1 == "(exit)":
+                                        lispOutput = "To exit this bot, type /quit"
+                                    else:
+                                        lispOutput = "Nothing returned."
+                            bot.sendMessage(chat_id=chatId, text=lispOutput)
                         else:
-                        	bot.sendMessage(chat_id=chatId, text="I'm sorry, "+getNickname(update.message.from_user.first_name)+", I can't let you do that.")
+                            bot.sendMessage(chat_id=chatId, text="I'm sorry, "+getNickname(update.message.from_user.first_name)+", I can't let you do that.")
                     popocmd = False
                     
                 elif cmd(b'fuck', msg):
@@ -559,7 +680,7 @@ def getMsg(bot):
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         bot.sendMessage(chat_id=chatId, text="Who do you want me to bone? And for how much?")
                     else:
-                    	if not popocmd:
+                        if not popocmd:
                             bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                             bot.sendMessage(chat_id=chatId, text="Well, fuck you too.")
                     popocmd = False
@@ -587,7 +708,7 @@ def getMsg(bot):
                         redditor = r.get_redditor(arg1[2:])
                         bot.sendMessage(chat_id=chatId, text=arg1[2:]+" has " + str(redditor.link_karma) + " link karma and " + str(redditor.comment_karma) + " comment karma.")
                     else:
-                    	if not popocmd:
+                        if not popocmd:
                             bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                             bot.sendMessage(chat_id=chatId, text="Idk what happens in this else block...")
                     popocmd = False
@@ -626,14 +747,14 @@ def getMsg(bot):
                         else:
                             bot.sendMessage(chat_id=chatId, text="Popo will be doing your mommy now.")
                     elif (b"This is" in msg) and (b"comment" in msg):
-                    	if not popocmd:
-                    	    bot.sendMessage(chat_id=chatId, text="{} And this is your mom.")
-                    	else:
-                    		bot.sendMessage(chat_id=chatId, text="Guess who came in last night.")
-                    		time.sleep(1)
-                    		bot.sendMessage(chat_id=chatId, text="Your mom.")
+                        if not popocmd:
+                            bot.sendMessage(chat_id=chatId, text="{} And this is your mom.")
+                        else:
+                            bot.sendMessage(chat_id=chatId, text="Guess who came in last night.")
+                            time.sleep(1)
+                            bot.sendMessage(chat_id=chatId, text="Your mom.")
                     else:
-                    	bot.sendMessage(chat_id=chatId, text="\"Sorry no ball\" -- Big Mama")
+                        bot.sendMessage(chat_id=chatId, text="\"Sorry no ball\" -- Big Mama")
                     popocmd = False
                 elif msg.startswith((b'@HyphanBot test')):
                     bot.sendMessage(chat_id=chatId, text="Tested.")
