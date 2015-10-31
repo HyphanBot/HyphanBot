@@ -276,9 +276,9 @@ def getMsg(bot):
             for x in arguments[:1]:
                 command = x
         
-            debug = "Got command '{0}' with the arguments '{1}'".format(str(command), argument)
+            debug = "Got command '{0}' with the arguments '{1}' in the chat '{2}'".format(str(command), argument, chatId)
             print(debug)
-
+            
             # if photocmd is set either send a photo or sticker
             if photocmd:
                 if update.message.photo:
