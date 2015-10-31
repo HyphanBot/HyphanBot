@@ -29,13 +29,5 @@
 (values))
 
 (defun vaal()
-	(dotimes (i 5) (format t "Vaal is shit~&"))
-(values))
-
-(defun exit()
-	(format t "I shall not take the commands of an inferior race.")
-(values))
-
-(defun quit()
-	(format t "Hyphan never quits, even if you tell 'er to.")
+	(dotimes (i 5) (format t "Vaal is cool~&"))
 (values))
