@@ -943,7 +943,7 @@ def getMsg(bot):
                             time.sleep(1)
                             bot.sendMessage(chat_id=chatId, text="Your mom.")
                     else:
-                    popocmd = False
+                        popocmd = False
 
                 elif msg.startswith((b'@HyphanBot test')):
                     bot.sendMessage(chat_id=chatId, text="Tested.")
