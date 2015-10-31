@@ -839,6 +839,9 @@ def getMsg(bot):
                                 submissions = r.get_subreddit(args[0]).get_top(limit=5)
                             elif args[1] == "new":
                                 submissions = r.get_subreddit(args[0]).get_new(limit=5)
+                            elif args[1].isdigit():
+                                number = int(args[2])
+                                submissions = r.get_subreddit(args[0]).get_hot(limit=number)
                             else:
                                 submissions = r.get_subreddit(args[0]).get_hot(limit=5)
 
