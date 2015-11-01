@@ -471,6 +471,18 @@ def getMsg(bot):
                             bot.sendMessage(chat_id=chatId, text="From now on, I'll start calling you " + getNickname(update.message.from_user.first_name) + ".")
                     popocmd = False
 
+                # scoobie, oobie, doobie, scoobie, doobie melody
+                elif cmd(b'scat', msg) or cmd(b'scatman', msg):
+                    message = "Hyphan is the scatman!\nhttps://www.youtube.com/watch?v=y6oXW_YiV6g"
+                    bot.sendMessage(chat_id=chatId, text=message)
+
+                # Return a random shitty song made by Europeans
+                elif cmd(b'eurodance', msg):
+                    # make a database of songs
+                    eurodance = ["https://www.youtube.com/watch?v=y6oXW_YiV6g", "https://www.youtube.com/watch?v=zA52uNzx7Y4", "https://www.youtube.com/watch?v=s9YbICd43Mc", "https://www.youtube.com/watch?v=boNRVXR7bqg", "https://www.youtube.com/watch?v=ZyhrYis509A", "https://www.youtube.com/watch?v=VcDy8HEg1QY"]
+                    euroReply = random.randint(0, len(eurodance) - 1)
+
+                    bot.sendMessage(chat_id=chatId, text=eurodance[euroReply])
                 # create a magical 8-ball 
                 elif cmd(b'magic8', msg) or cmd(b'8', msg):
                     # run the command both if someone uses /magic8 or /8
