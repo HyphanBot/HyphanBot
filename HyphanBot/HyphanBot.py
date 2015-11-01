@@ -292,6 +292,13 @@ def getMsg(bot):
                     photocmd = False
 
             if (msg):
+                # darude sandstorm
+                darude = random.randint(1, 1000)
+                if darude == 743:
+                    bot.sendMessage(chat_id=chatId, text="https://www.youtube.com/watch?v=y6120QOlsfU")
+        
+
+                
                 # if the command is popo send a photo
                 if ("popo" in msg.decode('utf-8').lower()):
                     bot.sendPhoto(chat_id=chatId, photo="http://img08.deviantart.net/e3f9/i/2010/254/f/1/mr__popo__s_deadly_eyes_by_khmaivietboi-d2yjspi.jpg")
