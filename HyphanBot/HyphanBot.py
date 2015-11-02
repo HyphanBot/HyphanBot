@@ -258,8 +258,9 @@ def getMsg(bot):
             user = update.message.from_user.username
             
             # print an error if hyphan crashed
-            if isRecovered:
-                print("I just recovered from a crash, sorry about that...")
+            # Commented because it loops, too annoying, and we already have a message like that.
+            #if isRecovered:
+            #    print("I just recovered from a crash, sorry about that...")
 
             # print a message with the command and arguments
             message = msg.decode("utf-8")
