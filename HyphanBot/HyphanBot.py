@@ -851,10 +851,10 @@ def getMsg(bot):
 
                     if arg1 == "":
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
-                        bot.sendMessage(chat_id=chatId, text="Please add a subreddit you want to look at!")
+                        bot.sendMessage(chat_id=chatId, text="What subreddit do you want me to check out? (Default amount: 5) Formats:\n /reddit <subreddit>\n /reddit <subreddit> <top/new>\n /reddit <subreddit> <amount>\n /reddit <subreddit> <top/new> <amount>\n /reddit <subreddit> <amount> <top/new>")
                     else:
                         # Grab some submissions from reddit
-                        r = praw.Reddit(user_agent='HyphanBot')
+                        r = praw.Reddit(user_agent='HyphanBot') # why is this defined twice?
 
                         if len(args) == 2:
                             number = 5
