@@ -542,17 +542,25 @@ def getMsg(bot):
                     arg1 = msg[cmdLen(b'announce', msg)+1:].decode("utf-8")
                     if arg1 == "":
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
-                        bot.sendMessage(chat_id=chatId, text="What do you want me to announce?")
+                        bot.sendMessage(chat_id=chatId, text="What do you want me to announce? Format:\n /announce <timeInSeconds> <announcement>")
                     elif user == "DeadManDying":
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         bot.sendMessage(chat_id=chatId, text="Bad Maxi bad!")
                     else:
-                        announceToChatId = chatId
-                        announceStr = arg1
-                        announceTime = 20
-                        announceStart = True
-                        bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
-                        bot.sendMessage(chat_id=chatId, text="Will announce '" + arg1 + "' in this chat every "+ str(announceTime) +" seconds.")
+                        args = arg1.split(" ")
+                        if not args[0].isdigit():
+                            bot.sendMessage(chat_id=chatId, text="For how long do you want me to wait before repeating the announcement? Format:\n /announce <timeInSeconds> <announcement>")
+                        else:
+                            unsorted = args[1:]
+                            announcement = ""
+                            for x in unsorted:
+                                announcement = announcement + x + " "
+                            announceToChatId = chatId
+                            announceStr = announcement
+                            announceTime = args[0]
+                            announceStart = True
+                            bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                            bot.sendMessage(chat_id=chatId, text="Will announce '" + announceStr + "' in this chat every "+ str(announceTime) +" seconds.")
                     popocmd = False
 
                 # pick one of a list of choices
