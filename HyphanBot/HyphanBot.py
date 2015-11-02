@@ -845,8 +845,11 @@ def getMsg(bot):
                         # fetch the comment and link karma and display them
                         bot.sendMessage(chat_id=chatId, text=arg1 + " has " + str(redditor.link_karma) + " link karma and " + str(redditor.comment_karma) + " comment karma.")
                     
-                elif cmd(b'reddit', msg):
-                    arg1 = msg[cmdLen(b'reddit', msg)+1:].decode("utf-8")
+                elif cmd(b'reddit', msg) or cmd(b'subreddit', msg):
+                    if cmd(b'reddit', msg):
+                        arg1 = msg[cmdLen(b'reddit', msg)+1:].decode("utf-8")
+                    elif cmd(b'subreddit', msg):
+                        arg1 = msg[cmdLen(b'subreddit', msg)+1:].decode("utf-8")
                     args = arg1.split()
 
                     if arg1 == "":
