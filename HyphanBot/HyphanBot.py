@@ -377,6 +377,15 @@ def getMsg(bot):
                     if arg1 == "":
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         if chatId < 0: # If the chat ID is less than 0 (aka negative number), it's a group chat, otherwise it's not.
+                            bot.sendMessage(chat_id=chatId, text="This is a group chat. What name do you want me to register it under? No spaces please! Format:\n /register <shortname>")
+                        else:
+                            if addRegKey(user, chatId):
+                                bot.sendMessage(chat_id=chatId, text="Registered chat with '"+user+"' (your username).")
+                            else:
+                                bot.sendMessage(chat_id=chatId, text="This chat is already registered with your username ("+user+").")
+                    else:
+                        bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                        if chatId < 0:
                             args = arg1.split(" ") # To insure that no spaces will be registered
                             if not getShortChatName(chatId) and addRegKey(args[0], chatId):
                                 message = "Registered group chat with {}.".format(args[0])
@@ -386,7 +395,7 @@ def getMsg(bot):
                                     message = "This shortname {} is already registered to another chat".format(args[0])
                                     bot.sendMessage(chat_id=chatId, text=message)
                                 else:
-                                    message = "This group chat is already as {}.".format(getShortChatName(chatId))
+                                    message = "This group chat is already registered as {}.".format(getShortChatName(chatId))
                                     bot.sendMessage(chat_id=chatId, text=message)
                     popocmd = False
                     
@@ -856,7 +865,7 @@ def getMsg(bot):
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         bot.sendMessage(chat_id=chatId, text="What subreddit do you want me to check out? (Default amount: 5) Formats:\n /reddit <subreddit>\n /reddit <subreddit> <top/new>\n /reddit <subreddit> <amount>\n /reddit <subreddit> <top/new> <amount>\n /reddit <subreddit> <amount> <top/new>")
                     else:
-                    	
+
                         # Grab some submissions from reddit
                         if len(args) == 2:
                             number = 5
