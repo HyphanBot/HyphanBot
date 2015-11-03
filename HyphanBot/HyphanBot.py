@@ -440,8 +440,14 @@ def getMsg(bot):
 
                     bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
 
+                    message = """
+                    This is Hyphan's nickname function! The following things are possible
+                    callme <nickname> | give yourself a new nickname
+                    nonick            | remove the nickname
+                    whoami            | check which nickname you have"""
+                    
                     if len(args) == 0:
-                        bot.sendMessage(chat_id=chatId, text="What of the following actions do you want me to do?\nfoo: bar\nEx: ample")
+                        bot.sendMessage(chat_id=chatId, text=message)
 
                     elif args[0] == "callme":
                         if len(args) == 1:
@@ -473,7 +479,7 @@ def getMsg(bot):
                             bot.sendMessage(chat_id=chatId, text="You've returned back to your first name, {}.".format(firstname))
                             
                     else:
-                        bot.sendMessage(chat_id=chatId, text="foobar")
+                        bot.sendMessage(chat_id=chatId, text="{} is not a valid command".format(args[0]))
 
                 # scoobie, oobie, doobie, scoobie, doobie melody
                 elif cmd(b'scat', msg) or cmd(b'scatman', msg):
