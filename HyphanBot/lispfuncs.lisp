@@ -23,7 +23,7 @@
 (values))
 
 (defun prelisp()
-	(with-open-file (stream "prelisp")
+	(with-open-file (stream "prelisp.lisp")
 		(do ((line (read-line stream nil) (read-line stream nil))) ((null line)) 
 		(write-line line)))
 (values))
