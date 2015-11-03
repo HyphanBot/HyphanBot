@@ -11,6 +11,7 @@ import bashquotes
 import requests
 import subprocess
 import praw # Python Reddit API Wrapper
+import xkcd
 
 from hackernews import HackerNews
 from html.parser import HTMLParser
@@ -639,6 +640,43 @@ def getMsg(bot):
                         bot.sendMessage(chat_id=chatId, text=getQuote(arg1))
                     popocmd = False
                     
+                # get xkcd comic!!
+                elif cmd(b'xkcd', msg):
+                    arg1 = msg[cmdLen(b'xkcd', msg)+1:].decode("utf-8")
+                    args = arg1.split(" ")
+                    bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                    helpMsg = "What xkcd comic do you want me to display? Formats:\n /xkcd <comicNumber>\n /xkcd latest\n /xkcd random\n /xkcd explain <comicNumber/latest/random>"
+                    message = "Weird error."
+                    comic = None
+                    showComic = True
+                    if len(args) == 0:
+                        message = helpMsg
+                    elif len(args) == 1:
+                        if args[0].isdigit():
+                            comic = xkcd.getComic(int(args[0]))
+                        elif args[0] == "latest":
+                            comic = xkcd.getLatestComic()
+                        elif args[0] == "random":
+                            comic = xkcd.getRandomComic()
+                        else:
+                            showComic = False
+                        message = ("{0}\n {1}\n '{2}'".format(comic.getTitle(), comic.getImageLink(), comic.getAltText())) if showComic else (helpMsg)
+                    elif len(args) == 2:
+                        if args[0] == "explain":
+                            if args[1].isdigit():
+                                comic = xkcd.getComic(int(args[1]))
+                            elif args[1] == "latest":
+                                comic = xkcd.getLatestComic()
+                            elif args[1] == "random":
+                                comic = xkcd.getRandomComic()
+                            else:
+                                showComic = False
+                        else:
+                            showComic = False
+                        message = ("Here is the explanation for the '{0}' comic:\n {1}".format(comic.getTitle(), comic.getExplanation())) if showComic else ("Invalid argument.\n {}".format(helpMsg))
+                    bot.sendMessage(chat_id=chatId, text=message)
+                    popocmd = False
+
                 # fetch a quote from the IRC quote site bash.
                 elif cmd(b'bashorg', msg) or cmd(b'bashquote', msg) or cmd(b'bquote', msg):
                     bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
