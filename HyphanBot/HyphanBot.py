@@ -377,7 +377,11 @@ def getMsg(bot):
                     if arg1 == "":
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         if chatId < 0: # If the chat ID is less than 0 (aka negative number), it's a group chat, otherwise it's not.
-                            bot.sendMessage(chat_id=chatId, text="This is a group chat. What name do you want me to register it under? No spaces please! Format:\n /register <shortname>")
+                            if getShortChatName(chatId):
+                                message = "This group chat is already registered under {}. You could register another group chat, or even yourself, by using the following commands:\n For other group chats: /register <shortname>\n For private chat (with me): /register".format(getShortChatName(chatId))
+                                bot.sendMessage(chat_id=chatId, text=message)
+                            else:
+                                bot.sendMessage(chat_id=chatId, text="This is a group chat. What name do you want me to register it under? No spaces please! Format:\n /register <shortname>")
                         else:
                             if addRegKey(user, chatId):
                                 bot.sendMessage(chat_id=chatId, text="Registered chat with '"+user+"' (your username).")
