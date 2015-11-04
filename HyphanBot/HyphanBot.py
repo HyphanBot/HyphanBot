@@ -308,7 +308,7 @@ def getMsg(bot):
                     popocmd = True
 
                 # return nothing
-                elif cmd(b'help', msg):
+                if cmd(b'help', msg):
                     if not popocmd:
                         bot.sendMessage(chat_id=chatId, text="?")
                     popocmd = False
@@ -357,6 +357,7 @@ def getMsg(bot):
             
                 # Registers a chat id with a username or, if used in a group chat, a short name.
                 elif cmd(b'register', msg):
+                    popocmd = False
                     arg1 = msg[cmdLen(b'register', msg)+1:].decode("utf-8")
 
                     if arg1 == "":
@@ -386,10 +387,10 @@ def getMsg(bot):
                                 else:
                                     message = "This group chat is already registered as {}.".format(getShortChatName(chatId))
                                     bot.sendMessage(chat_id=chatId, text=message)
-                    popocmd = False
                     
                 # To test the register command.
                 elif cmd(b'chatid', msg):
+                    popocmd = False
                     arg1 = msg[cmdLen(b'chatid', msg)+1:].decode("utf-8")
                     
                     if arg1 == "":
@@ -403,10 +404,10 @@ def getMsg(bot):
                             bot.sendMessage(chat_id=chatId, text="The registered chat ID for '"+arg1+"' is: "+str(requestedChatId))
                         else:
                             bot.sendMessage(chat_id=chatId, text="There is no registered chat ID assosiated with this name.\nTo register a chat with me under this name, use one of the folowing commands:\nIn private chat: /register\nIn group chats: /register "+arg1)
-                    popocmd = False
 
                 # Send a private message to someone through Hyphan.
                 elif cmd(b'pm', msg):
+                    popocmd = False
                     arg1 = msg[cmdLen(b'pm', msg)+1:].decode("utf-8")
                     
                     if arg1 == "":
@@ -433,7 +434,6 @@ def getMsg(bot):
                                     bot.sendMessage(chat_id=chatId, text="Sorry, I can't send a private message to a group.")
                             else:
                                 bot.sendMessage(chat_id=chatId, text="Sorry to tell you this, but the user you're trying to send a message to is not registered with me.")
-                    popocmd = False
 
                 elif cmd(b'nickname', msg):
                     arg1 = msg[cmdLen(b'nickname', msg)+1:].decode("utf-8")
