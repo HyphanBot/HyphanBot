@@ -931,12 +931,15 @@ def getMsg(bot):
                         titles = [str(x) for x in submission]
                         urls = [str(x.url) for x in submission]                        
 
-                        while number > 0:
+                        while 5 >= number > 0:
                             number = number - 1
                             title = titles.pop(number)
                             url = urls.pop(number)
                             story = title + ": \n" + url
                             bot.sendMessage(chat_id=chatId, text=story)
+
+                        if number > 5:
+                            bot.sendMessage(chat_id=chatId, text="My post limit is 5 or lower.")
 
                 # hackernews posts
                 elif cmd(b'hackernews', msg):
@@ -958,11 +961,14 @@ def getMsg(bot):
                     if not number_check:
                         number = 5
 
-                    while number > 0:
+                    while 5 >= number > 0:
                         number  = number - 1
                         storys = hn.item(stories.pop(number))
                         story = storys.title + ": \n" + storys.url
                         bot.sendMessage(chat_id=chatId, text=story)
+
+                    if number > 5:
+                        bot.sendMessage(chat_id=chatId, text="My post limit is 5 or lower.")
                                         
                 # quit the bot. 
                 elif cmd(b'quit', msg):
