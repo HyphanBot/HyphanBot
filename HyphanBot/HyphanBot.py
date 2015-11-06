@@ -332,9 +332,9 @@ def getMsg(bot):
                 # return nothing
                 if cmd(b'help', msg):
                     if not popocmd:
-                        egg = random.randint(1,10)
+                        egg = random.randint(1,20)
                         print(egg)
-                        if egg == 5:
+                        if egg == 10:
                             randNames = ["HYPHAN", "PIKACHU", "NERD", "BOT"]
                             randAttacks = ["SCRATCH", "THUNDERBOLT", "ELECTROCUTE", "MURDER", "JAIL"]
                             nameChoiceNum = random.randint(0, len(randNames)-1)
