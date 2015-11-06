@@ -34,6 +34,11 @@ def main():
     global photocmd
     global popocmd
 
+    global nameChoice
+    global attackChoice
+    global battleMode
+    global fightMode
+
     global r
 
     # set the bot name
@@ -79,6 +84,11 @@ def main():
     # create the variables for the photo functions (one specific to DBZ character)
     photocmd = False
     popocmd = False
+
+    nameChoice = ""
+    attackChoice = ""
+    battleMode = False
+    fightMode = False
 
     while True:
         getMsg(bot)
@@ -237,6 +247,11 @@ def getMsg(bot):
 
     global popocmd
 
+    global nameChoice
+    global attackChoice
+    global battleMode
+    global fightMode
+
     global r
 
     # a simple recursive function to repeats a message X amounts of time.
@@ -317,8 +332,88 @@ def getMsg(bot):
                 # return nothing
                 if cmd(b'help', msg):
                     if not popocmd:
-                        bot.sendMessage(chat_id=chatId, text="?")
+                        egg = random.randint(1,10)
+                        print(egg)
+                        if egg == 5:
+                            randNames = ["HYPHAN", "PIKACHU", "NERD", "BOT"]
+                            randAttacks = ["SCRATCH", "THUNDERBOLT", "ELECTROCUTE", "MURDER", "JAIL"]
+                            nameChoiceNum = random.randint(0, len(randNames)-1)
+                            nameChoice = randNames[nameChoiceNum]
+                            attackChoiceNum = random.randint(0, len(randAttacks)-1)
+                            attackChoice = randAttacks[attackChoiceNum]
+                            bot.sendMessage(chat_id=chatId, text="Wild {} appeared!".format(nameChoice))
+                            time.sleep(1)
+                            bot.sendMessage(chat_id=chatId, text="Go, {}!".format(firstname.upper()))
+                            time.sleep(1)
+                            bot.sendMessage(chat_id=chatId, text="What will {} do?\n /FIGHT /PKMN\n /ITEMS /RUN".format(firstname.upper()))
+                            battleMode = True
+                        else:
+                            bot.sendMessage(chat_id=chatId, text="?")
                     popocmd = False
+
+                elif msg.startswith(b'/FIGHT'):
+                    if battleMode:
+                        bot.sendMessage(chat_id=chatId, text="/SCRATCH\n/PUNCH\n/KICK\n/JUMP")
+                        fightMode = True
+
+                elif msg.startswith(b'/PKMN'):
+                    if battleMode:
+                        bot.sendMessage(chat_id=chatId, text="You have no other Pokemon.")
+
+                elif msg.startswith(b'/ITEMS'):
+                    if battleMode:
+                        bot.sendMessage(chat_id=chatId, text="You have no Items.")
+
+                elif msg.startswith(b'/RUN'):
+                    if battleMode:
+                        bot.sendMessage(chat_id=chatId, text="Got away safely!")
+                        battleMode = False
+
+                elif msg.startswith(b'/SCRATCH') or msg.startswith(b'/PUNCH') or msg.startswith(b'/KICK') or msg.startswith(b'/JUMP'):
+                    if battleMode:
+                        if fightMode:
+                            attack = ""
+                            if msg.startswith(b'/SCRATCH'):
+                                attack = "SCRATCH"
+                            elif msg.startswith(b'/PUNCH'):
+                                attack = "PUNCH"
+                            elif msg.startswith(b'/KICK'):
+                                attack = "KICK"
+                            elif msg.startswith(b'/JUMP'):
+                                attack = "JUMP"
+                            bot.sendMessage(chat_id=chatId, text="{0} used {1}!".format(firstname.upper(),attack))
+                            result = random.randint(1,4)
+                            time.sleep(1)
+                            if result == 1:
+                                bot.sendMessage(chat_id=chatId, text="It was super effective!")
+                            elif result == 2:
+                                bot.sendMessage(chat_id=chatId, text="Critical hit!")
+                            elif result == 3:
+                                bot.sendMessage(chat_id=chatId, text="It's not very effective...")
+                            if result == 1 or result == 2:
+                                time.sleep(1)
+                                bot.sendMessage(chat_id=chatId, text="Enemy {} fainted!".format(nameChoice))
+                                time.sleep(1)
+                                bot.sendMessage(chat_id=chatId, text="{} won!".format(firstname.upper()))
+                                fightMode = False
+                                battleMode = False
+                            else:
+                                randAttacks = ["SCRATCH", "THUNDERBOLT", "ELECTROCUTE", "MURDER", "JAIL"]
+                                attackChoiceNum = random.randint(0, len(randAttacks)-1)
+                                attackChoice = randAttacks[attackChoiceNum]
+                                bot.sendMessage(chat_id=chatId, text="Enemy {0} used {1}!".format(nameChoice, attackChoice))
+                                result2 = random.randint(1,2)
+                                time.sleep(1)
+                                if result2 == 1:
+                                    bot.sendMessage(chat_id=chatId, text="It was super effective!")
+                                elif result2 == 2:
+                                    bot.sendMessage(chat_id=chatId, text="Critical hit!")
+                                time.sleep(1)
+                                bot.sendMessage(chat_id=chatId, text="{} fainted!".format(firstname.upper()))
+                                time.sleep(1)
+                                bot.sendMessage(chat_id=chatId, text="{} won!".format(nameChoice))
+                                fightMode = False
+                                battleMode = False
 
                 # send an about message if someone ask for it
                 elif cmd(b'about', msg):
