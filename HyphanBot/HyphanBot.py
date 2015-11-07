@@ -34,6 +34,12 @@ def main():
     global photocmd
     global popocmd
 
+    # ed
+    global ed
+    global messagemode
+    global foobar
+    global editedtext
+
     global nameChoice
     global attackChoice
     global battleMode
@@ -44,6 +50,11 @@ def main():
     # set the bot name
     botName = "Hyphan"
 
+    # ed
+    ed = False
+    foobar = False
+    message = ""
+    
     # create an empty array for nicknames
     nicknames = {}
 
@@ -247,6 +258,12 @@ def getMsg(bot):
 
     global popocmd
 
+    # ed
+    global ed
+    global messagemode
+    global foobar
+    global editedtext
+    
     global nameChoice
     global attackChoice
     global battleMode
@@ -275,7 +292,7 @@ def getMsg(bot):
             user = update.message.from_user.username
             firstname = update.message.from_user.first_name
             nickname = getNickname(firstname)
-            
+
             # print an error if hyphan crashed
             # Commented because it loops, too annoying, and we already have a message like that.
             #if isRecovered:
@@ -399,6 +416,7 @@ def getMsg(bot):
                                 battleMode = False
                             else:
                                 randAttacks = ["SCRATCH", "THUNDERBOLT", "ELECTROCUTE", "MURDER", "JAIL"]
+
                                 attackChoiceNum = random.randint(0, len(randAttacks)-1)
                                 attackChoice = randAttacks[attackChoiceNum]
                                 bot.sendMessage(chat_id=chatId, text="Enemy {0} used {1}!".format(nameChoice, attackChoice))
@@ -415,11 +433,52 @@ def getMsg(bot):
                                 fightMode = False
                                 battleMode = False
 
+                elif cmd(b'ed', msg):
+                    global editedtext
+                    global messagemode
+                    global foobar
+                    global ed
+                    
+                    editedtext = ""
+                    messagemode = False
+                    foobar = False
+                    ed = True
+
+                elif ed == True:
+                    if message == "P":
+                        foobar = True
+                        bot.sendMessage(chat_id=chatId, text="*")
+                        
+                    elif messagemode == True:
+                        if message == ".":
+                            messagemode = False
+                        else:
+                            editedtext = editedtext + '\n' + message
+                            
+                    elif foobar == True:
+                        if message == "q":
+                            foobar = False
+                            ed = False
+                            
+                        elif message[:1] == "p":
+                            bot.sendMessage(chat_id=chatId, text=editedtext)
+                            
+                        elif message[:1] == "i":
+                            messagemode = True
+                        else:
+                            print(message[:1])
+                            bot.sendMessage(chat_id=chatId, text="* {}".format(message))
+
+                    else:
+                        print(message)
+                        bot.sendMessage(chat_id=chatId, text="?")
+                    
                 # send an about message if someone ask for it
                 elif cmd(b'about', msg):
                     if not popocmd:
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         time.sleep(1)
+                        bot.sendMessage(chat_id=chatId, text="foobar {0}, {1}, {2}".format(message, command, ed))
                         bot.sendMessage(chat_id=chatId, text="I am King "+botName+", ruler of the northern part of the galaxy.")
                     popocmd = False
 
