@@ -492,12 +492,11 @@ def getMsg(bot):
                             
                         elif message[:1] == "i":
                             messagemode = True
+
                         else:
-                            print(message[:1])
                             bot.sendMessage(chat_id=chatId, text="?")
 
                     else:
-                        print(message)
                         bot.sendMessage(chat_id=chatId, text="?")
                     
                 # send an about message if someone ask for it
@@ -505,7 +504,6 @@ def getMsg(bot):
                     if not popocmd:
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         time.sleep(1)
-                        bot.sendMessage(chat_id=chatId, text="foobar {0}, {1}, {2}".format(message, command, ed))
                         bot.sendMessage(chat_id=chatId, text="I am King "+botName+", ruler of the northern part of the galaxy.")
                     popocmd = False
 
