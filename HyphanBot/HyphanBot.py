@@ -39,7 +39,8 @@ def main():
     global messagemode
     global foobar
     global editedtext
-
+    global chatided
+    
     global nameChoice
     global attackChoice
     global battleMode
@@ -263,6 +264,7 @@ def getMsg(bot):
     global messagemode
     global foobar
     global editedtext
+    global chatided
     
     global nameChoice
     global attackChoice
@@ -437,8 +439,10 @@ def getMsg(bot):
                     global editedtext
                     global messagemode
                     global foobar
+                    global chatided
                     global ed
-                    
+
+                    chatided = chatId
                     editedtext = ""
                     messagemode = False
                     foobar = False
@@ -447,7 +451,8 @@ def getMsg(bot):
                 elif ed == True:
                     if message == "P":
                         foobar = True
-                        bot.sendMessage(chat_id=chatId, text="*")
+                        if chatId == chatided:
+                            bot.sendMessage(chat_id=chatided, text="*")
                         
                     elif messagemode == True:
                         if message == ".":
@@ -469,8 +474,9 @@ def getMsg(bot):
                                     temp = temp + x
                                 else:
                                     lastline = x
+                            if chatId == chatided:
+                                bot.sendMessage(chat_id=chatided, text=lastline)
                                 
-                            bot.sendMessage(chat_id=chatId, text=lastline)
                         elif message[1:2] == "p" and message[:1].isdigit():
                             splittext = editedtext.split('\n')
                             temp = ""
@@ -479,25 +485,30 @@ def getMsg(bot):
                                 if temp == "":
                                     temp = x
                                     line = x
+                                    
                                 elif len(temp.split('\n')) == int(message[:1]) - 1:
                                     line = x
                                     temp = temp + '\n' + x
+                                    
                                 else:
                                     temp = x + '\n' + temp
 
                             if int(message[:1]) + 1 > len(splittext):
                                 line = "?"
 
-                            bot.sendMessage(chat_id=chatId, text=line)
+                            if chatId == chatided:
+                                bot.sendMessage(chat_id=chatided, text=line)
                             
                         elif message[:1] == "i":
                             messagemode = True
 
                         else:
-                            bot.sendMessage(chat_id=chatId, text="?")
+                            if chatId == chatided:
+                                bot.sendMessage(chat_id=chatided, text="?")
 
                     else:
-                        bot.sendMessage(chat_id=chatId, text="?")
+                        if chatId == chatided:
+                            bot.sendMessage(chat_id=chatided, text="?")
                     
                 # send an about message if someone ask for it
                 elif cmd(b'about', msg):
