@@ -461,13 +461,40 @@ def getMsg(bot):
                             ed = False
                             
                         elif message[:1] == "p":
-                            bot.sendMessage(chat_id=chatId, text=editedtext)
+                            temp = ""
+                            splittext = editedtext.split('\n')
+
+                            for x in splittext:
+                                if len(splittext) == len(temp) - 1:
+                                    temp = temp + x
+                                else:
+                                    lastline = x
+                                
+                            bot.sendMessage(chat_id=chatId, text=lastline)
+                        elif message[1:2] == "p" and message[:1].isdigit():
+                            splittext = editedtext.split('\n')
+                            temp = ""
+                            
+                            for x in splittext:
+                                if temp == "":
+                                    temp = x
+                                    line = x
+                                elif len(temp.split('\n')) == int(message[:1]) - 1:
+                                    line = x
+                                    temp = temp + '\n' + x
+                                else:
+                                    temp = x + '\n' + temp
+
+                            if int(message[:1]) + 1 > len(splittext):
+                                line = "?"
+
+                            bot.sendMessage(chat_id=chatId, text=line)
                             
                         elif message[:1] == "i":
                             messagemode = True
                         else:
                             print(message[:1])
-                            bot.sendMessage(chat_id=chatId, text="* {}".format(message))
+                            bot.sendMessage(chat_id=chatId, text="?")
 
                     else:
                         print(message)
