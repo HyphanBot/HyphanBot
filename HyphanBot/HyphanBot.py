@@ -435,6 +435,7 @@ def getMsg(bot):
                                 fightMode = False
                                 battleMode = False
 
+                # enable ed mode and initialize the various ed modes
                 elif cmd(b'ed', msg):
                     global editedtext
                     global messagemode
@@ -442,38 +443,45 @@ def getMsg(bot):
                     global chatided
                     global ed
 
+                    # make sure that ed only is ed in one chat
                     chatided = chatId
                     editedtext = ""
                     messagemode = False
                     foobar = False
                     ed = True
 
-                elif ed == True:
+                elif ed == True and chatId == chatided:
+                    # enter into command mode
                     if message == "P":
                         foobar = True
                         if chatId == chatided:
                             bot.sendMessage(chat_id=chatided, text="*")
                         
                     elif messagemode == True:
+                        # stop the text input
                         if message == ".":
                             messagemode = False
                         else:
                             editedtext = editedtext + '\n' + message
                             
                     elif foobar == True:
+                        # quit ed
                         if message == "q":
                             foobar = False
                             ed = False
                             
                         elif message[:1] == "p":
                             temp = ""
+                            # split the text into lines
                             splittext = editedtext.split('\n')
 
                             for x in splittext:
+                                # show the last line
                                 if len(splittext) == len(temp) - 1:
                                     temp = temp + x
                                 else:
                                     lastline = x
+                                    
                             if chatId == chatided:
                                 bot.sendMessage(chat_id=chatided, text=lastline)
                                 
@@ -485,7 +493,8 @@ def getMsg(bot):
                                 if temp == "":
                                     temp = x
                                     line = x
-                                    
+
+                                # adjust for the difference in counting
                                 elif len(temp.split('\n')) == int(message[:1]) - 1:
                                     line = x
                                     temp = temp + '\n' + x
@@ -493,12 +502,14 @@ def getMsg(bot):
                                 else:
                                     temp = x + '\n' + temp
 
+                            # if the line number higher is then possible respond with ?
                             if int(message[:1]) + 1 > len(splittext):
                                 line = "?"
 
                             if chatId == chatided:
                                 bot.sendMessage(chat_id=chatided, text=line)
-                            
+
+                        # enable messagemode
                         elif message[:1] == "i":
                             messagemode = True
 
