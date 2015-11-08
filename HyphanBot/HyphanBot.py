@@ -315,7 +315,8 @@ def getMsg(bot):
             for x in arguments[:1]:
                 command = x
         
-            debug = "Got command '{0}' with the arguments '{1}' in the chat '{2}'".format(str(command), argument, chatId)
+            #debug = "Got command '{0}' with the arguments '{1}' in the chat '{2}'".format(str(command), argument, chatId)
+            debug = "[{0}] {1} ({2}): {3}".format(chatId, firstname, user, message)
             print(debug)
             
             # if photocmd is set either send a photo or sticker
@@ -1226,7 +1227,7 @@ def getMsg(bot):
                     bot.sendMessage(chat_id=chatId, text="Tested.")
                     
                 else:
-                    print("Got unknown command")
+                    #print("Got unknown command")
                     popocmd = False
             
                 latestUpdateId = update.update_id
