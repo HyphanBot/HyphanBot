@@ -1,5 +1,7 @@
 (defun lispfuncs()
-	(with-open-file (stream "lispfuncs")
+	(format t "```~%")
+	(with-open-file (stream "lispfuncs.lisp")
 		(do ((line (read-line stream nil) (read-line stream nil))) ((null line)) 
 		(write-line line)))
+	(format t "```")
 (values))
