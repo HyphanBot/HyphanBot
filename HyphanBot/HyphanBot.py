@@ -314,10 +314,6 @@ def getMsg(bot):
 
             for x in arguments[:1]:
                 command = x
-        
-            #debug = "Got command '{0}' with the arguments '{1}' in the chat '{2}'".format(str(command), argument, chatId)
-            debug = "[{0}] {1} ({2}): {3}".format(chatId, firstname, user, message)
-            print(debug)
             
             # if photocmd is set either send a photo or sticker
             if photocmd:
@@ -332,6 +328,9 @@ def getMsg(bot):
                     photocmd = False
 
             if (msg):
+                debug = "[{0}] {1} ({2}): {3}".format(chatId, firstname, user, message)
+                print(debug)
+
                 # darude sandstorm
                 darude = random.randint(1, 1000)
                 if darude == 743:
