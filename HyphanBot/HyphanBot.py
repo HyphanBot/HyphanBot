@@ -309,7 +309,7 @@ def getMsg(bot):
                     photocmd = False
 
             if (msg):
-                debug = "[{0}] {1} ({2}, {3}): {4}".format(chatId, firstname, username, user, message)
+                debug = "[{0}] {1} ({2}, {3}): {4}".format(chatId, firstname, nickname, user, message)
                 print(debug)
 
                 # darude sandstorm
