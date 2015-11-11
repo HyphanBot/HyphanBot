@@ -289,32 +289,13 @@ def getMsg(bot):
             
             # make the msg readable
             msg = update.message.text.encode('utf-8')
+            message = msg.decode("utf-8")
 
             # get the name, firstname and nickname of the user
             user = update.message.from_user.username
             firstname = update.message.from_user.first_name
             nickname = getNickname(firstname)
 
-            # print an error if hyphan crashed
-            # Commented because it loops, too annoying, and we already have a message like that.
-            #if isRecovered:
-            #    print("I just recovered from a crash, sorry about that...")
-
-            # print a message with the command and arguments
-            message = msg.decode("utf-8")
-            arguments = message.split()
-            command = ""
-            argument =  ""
-            
-            for x in arguments[1:]:
-                if len(argument) == 0:
-                    argument = argument + x
-                else:
-                    argument = argument + " " + x
-
-            for x in arguments[:1]:
-                command = x
-            
             # if photocmd is set either send a photo or sticker
             if photocmd:
                 if update.message.photo:
@@ -328,7 +309,7 @@ def getMsg(bot):
                     photocmd = False
 
             if (msg):
-                debug = "[{0}] {1} ({2}): {3}".format(chatId, firstname, user, message)
+                debug = "[{0}] {1} ({2}, {3}): {4}".format(chatId, firstname, username, user, message)
                 print(debug)
 
                 # darude sandstorm
@@ -470,7 +451,7 @@ def getMsg(bot):
                             foobar = False
                             ed = False
                             
-                        elif message[:1] == "p":
+                        elif message == "p" or message == ".p":
                             temp = ""
                             # split the text into lines
                             splittext = editedtext.split('\n')
@@ -484,7 +465,11 @@ def getMsg(bot):
                                     
                             if chatId == chatided:
                                 bot.sendMessage(chat_id=chatided, text=lastline)
-                                
+
+                        elif message == "1,$p" or message == ",p":
+                            if chatId == chatided:
+                                bot.sendMessage(chat_id=chatided, text=editedtext)
+
                         elif message[1:2] == "p" and message[:1].isdigit():
                             splittext = editedtext.split('\n')
                             temp = ""
