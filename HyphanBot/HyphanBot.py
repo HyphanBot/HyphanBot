@@ -329,6 +329,10 @@ def getMsg(bot):
                     bot.sendMessage(chat_id=chatId, text="HIII!!")
                     popocmd = True
 
+                # Error handler
+                if ("syntax error" in msg.decode('utf-8').lower()):
+                    bot.sendMessage(chat_id=chatId, text="Syntax error")
+
                 # return nothing
                 if cmd(b'help', msg):
                     if not popocmd:
