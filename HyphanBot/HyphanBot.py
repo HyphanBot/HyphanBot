@@ -12,6 +12,7 @@ import requests
 import subprocess
 import praw # Python Reddit API Wrapper
 import xkcd
+import urbandict
 
 from uptime import uptime
 from hackernews import HackerNews
@@ -1166,6 +1167,32 @@ def getMsg(bot):
 
                     if number > 5:
                         bot.sendMessage(chat_id=chatId, text="My post limit is 5 or lower.")
+
+                # Provides acurate definitions of a word or phrase
+                elif cmd(b'define', msg):
+                    arg1 = msg[cmdLen(b'define', msg)+1:].decode("utf-8")
+                    bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
+                    message = "Weird error!"
+                    if arg1 == "":
+                        message = "What do you want me to define? Format:\n /define <term>"
+                    else:
+                        defined = urbandict.define(arg1)
+                        randIndex = random.randint(0,len(defined)-1)
+                        word = defined[randIndex]["word"].strip()
+                        definition = defined[randIndex]["def"]
+                        example = defined[randIndex]["example"]
+                        #url = ("\nhttp://urbandictionary.com" if ("¯\\_(ツ)_/¯" in word) and ("¯\\_(ツ)_/¯" not in arg1) else "\nhttp://urbandictionary.com/define.php?term="+word)
+                        deftext = definition
+                        if ("¯\\_(ツ)_/¯" in word) and ("¯\\_(ツ)_/¯" not in arg1):
+                            url = "\nhttp://urbandictionary.com"
+                        else:
+                            deftext = "\nDefinition:" + definition
+                            url = "\nhttp://urbandictionary.com/define.php?term="+word
+                        if example == "":
+                            message = word + "\n" + deftext + url
+                        else:
+                            message = word + "\n" + deftext + "\nExamples:" + example + url
+                    bot.sendMessage(chat_id=chatId, text=message)
                                         
                 # quit the bot. 
                 elif cmd(b'quit', msg):
