@@ -41,14 +41,24 @@ def main():
     global foobar
     global editedtext
     global chatided
-    
+
+    # Pokeman
+    global pokeman
+    global hp
+    global dexterity
+    global enemy_hp
+    global enemy_dexterity
     global nameChoice
     global attackChoice
     global battleMode
     global fightMode
 
     global r
+    global oldtitle
 
+    # foo
+    oldtitle = ""
+    
     # set the bot name
     botName = "Hyphan"
 
@@ -98,6 +108,7 @@ def main():
     photocmd = False
     popocmd = False
 
+    pokeman = False
     nameChoice = ""
     attackChoice = ""
     battleMode = False
@@ -273,7 +284,8 @@ def getMsg(bot):
     global fightMode
 
     global r
-
+    global oldtitle
+    
     # a simple recursive function to repeats a message X amounts of time.
     if announceStart:
         if announceTimer == 0:
@@ -292,6 +304,10 @@ def getMsg(bot):
             msg = update.message.text.encode('utf-8')
             message = msg.decode("utf-8")
 
+            if oldtitle != update.message.chat.title and len(oldtitle) != 0:
+                bot.sendMessage(chat_id=chatId, text="Why did you change the name to {}, eh.".format(update.message.chat.title))
+
+            oldtitle = update.message.chat.title
             # get the name, firstname and nickname of the user
             user = update.message.from_user.username
             firstname = update.message.from_user.first_name
@@ -336,91 +352,181 @@ def getMsg(bot):
 
                 # return nothing
                 if cmd(b'help', msg):
+                    global pokeman
+                    global chatided
+                    global battleMode
+                    global hp
+                    global dexterity
+                    global enemy_hp
+                    global enemy_dexterity
+                    
                     if not popocmd:
-                        egg = random.randint(1,20)
-                        print(egg)
-                        if egg == 10:
-                            randNames = ["HYPHAN", "PIKACHU", "NERD", "BOT"]
-                            randAttacks = ["SCRATCH", "THUNDERBOLT", "ELECTROCUTE", "MURDER", "JAIL"]
-                            nameChoiceNum = random.randint(0, len(randNames)-1)
-                            nameChoice = randNames[nameChoiceNum]
-                            attackChoiceNum = random.randint(0, len(randAttacks)-1)
-                            attackChoice = randAttacks[attackChoiceNum]
-                            bot.sendMessage(chat_id=chatId, text="Wild {} appeared!".format(nameChoice))
-                            time.sleep(1)
-                            bot.sendMessage(chat_id=chatId, text="Go, {}!".format(firstname.upper()))
-                            time.sleep(1)
-                            bot.sendMessage(chat_id=chatId, text="What will {} do?\n /FIGHT /PKMN\n /ITEMS /RUN".format(firstname.upper()))
+                        egg = 42
+                        if egg == 42:
+                            pokeman = True
+                            chatided = chatId
                             battleMode = True
+                            hp = 20
+                            dexterity = 40
+                            enemy_hp = 25
+                            enemy_dexterity = 30
+
+                            randNames = ["HYPHAN", "PIKACHU", "NERD", "BOT"]
+                            nameChoiceNum = random.randint(0, len(randNames) - 1)
+                            nameChoice = randNames[nameChoiceNum]
+                            bot.sendMessage(chat_id=chatId, text="Wild {} appeared!".format(nameChoice))
+                            bot.sendMessage(chat_id=chatId, text="Go, {}!".format(firstname.upper()))
+                            bot.sendMessage(chat_id=chatId, text="What will {} do?\n /FIGHT /PKMN\n /ITEMS /RUN".format(firstname.upper()))
                         else:
                             bot.sendMessage(chat_id=chatId, text="?")
                     popocmd = False
 
-                elif msg.startswith(b'/FIGHT'):
-                    if battleMode:
-                        bot.sendMessage(chat_id=chatId, text="/SCRATCH\n/PUNCH\n/KICK\n/JUMP")
+                if pokeman == True and chatId == chatided:
+                    global run
+                    run = True
+                    lowmessage = message.lower()
+                    if fightMode == True:
+                        if len(lowmessage.split()) != 1:
+                            bot.sendMessage(chat_id=chatId, text="That is not a valid command")
+                            run = False
+                            
+                        elif lowmessage == "scratch":
+                            result = random.randint(0,5)
+                            dexterity = dexterity - 3
+                            
+                            if result == 5:
+                                effectiveness = "It was super effective!"
+                            elif result >= 4:
+                                effectiveness = "Critical hit!"
+                            elif result <= 1:
+                                effectiveness = "It's not very effective..."
+                            else:
+                                effectiveness = "It's mediocre, just like your mom"
+                                
+                        elif lowmessage == "punch" or lowmessage == "pnch":
+                            result = random.randint(0,10)
+                            dexterity = dexterity - 6
+
+                            if result == 10:
+                                effectiveness = "It was super effective!"
+                            elif result >= 8:
+                                effectiveness = "Critical hit!"
+                            elif result <= 2:
+                                effectiveness = "It's not very effective..."
+                            else:
+                                effectiveness = "It's mediocre, just like your mom"
+
+                        elif lowmessage == "kick":
+                            result = random.randint(7,10)
+                            dexterity = dexterity - 10
+                            
+                            if result == 12:
+                                effectiveness = "It was super effective!"
+                            elif result >= 10:
+                                effectiveness = "Critical hit!"
+                            else:
+                                effectiveness = "It's mediocre, just like your mom"
+
+                        elif lowmessage == "jump":
+                            result = 0
+                            dexterity = dexterity - 1
+                            effectiveness = "Not at all"
+
+                        else:
+                            bot.sendMessage(chat_id=chatId, text="Your pokemon doesn't know that move!")
+                            run = False
+                            
+                        if run == True:
+                            bot.sendMessage(chat_id=chatId, text="{0} used {1}!".format(firstname.upper(), lowmessage.upper()))
+                            bot.sendMessage(chat_id=chatId, text=effectiveness)
+                        
+                            enemy_hp = enemy_hp - result
+                            bot.sendMessage(chat_id=chatId, text="{0} took {1} HP damage! He has {2} HP left!".format(nameChoice.upper(), result, enemy_hp))
+
+                            if enemy_hp <= 0:
+                                bot.sendMessage(chat_id=chatId, text="{} fainted!".format(nameChoice.upper()))
+                                fightMode = False
+                                pokeman = False
+                            else:
+                                bot.sendMessage(chat_id=chatId, text="This is going to do something!")
+                                randAttacks = ["scratch", "watercannon", "harden", "tackle"]
+                                randChoose = random.randint(0, len(randAttacks) - 1)
+                                
+                                if randAttacks[randChoose] == "scratch":
+                                    result = random.randint(0,5)
+                                    enemy_dexterity = enemy_dexterity - 3
+
+                                    if result == 5:
+                                        effectiveness = "it was super effextive!"
+                                    elif result >= 4:
+                                        effectiveness = "Critical hit!"
+                                    elif result <= 1:
+                                        effectiveness = "It's not very effective..."
+                                    else:
+                                        effectiveness = "It's mediocre, just like your mom"
+                                        
+                                elif randAttacks[randChoose] == "watercannon":
+                                    result = random.randint(7,15)
+                                    enemy_dexterity = enemy_dexterity - 15
+                                    
+                                    if result == 12:
+                                        effectiveness = "It was super effective!"
+                                    elif result == 11:
+                                        effectiveness = "Critical hit!"
+                                    elif result <= 8:
+                                        effectiveness = "It's not very effective"
+                                    else:
+                                        effectiveness = "It's mediocre, just like your mom"
+
+                                elif randAttacks[randChoose] == "harden":
+                                    result = 0
+                                    enemy_dexterity = enemy_dexterity - 1
+
+                                    effectiveness = "Honestly what did you expect to happen?"
+
+                                elif randAttacks[randChoose] == "tackle":
+                                    result = random.randint(0,10)
+                                    enemy_dexterity = enemy_dexterity - 6
+
+                                    if result == 10:
+                                        effectiveness = "It was super effective!"
+                                    elif result >= 8:
+                                        effectiveness = "Critical hit!"
+                                    elif result <= 2:
+                                        effectiveness = "It's not very effective..."
+                                    else:
+                                        effectiveness = "It's mediocre, just like your mom"
+                                else:
+                                    bot.sendMessage(chat_id=chatId, text="Something went horribly wrong...")
+
+                                    bot.sendMessage(chat_id=chatId, text="{0} used {1}!".format(nameChoice, randAttacks[randChoose].upper()))
+                                    bot.sendMessage(chat_id=chatId, text=effectiveness)
+                                    
+                                    hp = hp - result
+                                    bot.sendMessage(chat_id=chatId, text="{0} took {1} HP damage! He has {2} HP left!".format(firstname.upper(), result, hp))
+
+                                    if hp <= 0:
+                                        bot.sendMessage(chat_id=chatId, text="Game over!")
+                                        fightMode = False
+                                        pokeman = False
+                                
+                    elif lowmessage == "fight":
+                        bot.sendMessage(chat_id=chatId, text="SCRATCH\nPNCH\nKICK\nJUMP")
                         fightMode = True
 
-                elif msg.startswith(b'/PKMN'):
-                    if battleMode:
-                        bot.sendMessage(chat_id=chatId, text="You have no other Pokemon.")
-
-                elif msg.startswith(b'/ITEMS'):
-                    if battleMode:
-                        bot.sendMessage(chat_id=chatId, text="You have no Items.")
-
-                elif msg.startswith(b'/RUN'):
-                    if battleMode:
+                    elif lowmessage == "run":
                         bot.sendMessage(chat_id=chatId, text="Got away safely!")
-                        battleMode = False
+                        pokeman = False
 
-                elif msg.startswith(b'/SCRATCH') or msg.startswith(b'/PUNCH') or msg.startswith(b'/KICK') or msg.startswith(b'/JUMP'):
-                    if battleMode:
-                        if fightMode:
-                            attack = ""
-                            if msg.startswith(b'/SCRATCH'):
-                                attack = "SCRATCH"
-                            elif msg.startswith(b'/PUNCH'):
-                                attack = "PUNCH"
-                            elif msg.startswith(b'/KICK'):
-                                attack = "KICK"
-                            elif msg.startswith(b'/JUMP'):
-                                attack = "JUMP"
-                            bot.sendMessage(chat_id=chatId, text="{0} used {1}!".format(firstname.upper(),attack))
-                            result = random.randint(1,4)
-                            time.sleep(1)
-                            if result == 1:
-                                bot.sendMessage(chat_id=chatId, text="It was super effective!")
-                            elif result == 2:
-                                bot.sendMessage(chat_id=chatId, text="Critical hit!")
-                            elif result == 3:
-                                bot.sendMessage(chat_id=chatId, text="It's not very effective...")
-                            if result == 1 or result == 2:
-                                time.sleep(1)
-                                bot.sendMessage(chat_id=chatId, text="Enemy {} fainted!".format(nameChoice))
-                                time.sleep(1)
-                                bot.sendMessage(chat_id=chatId, text="{} won!".format(firstname.upper()))
-                                fightMode = False
-                                battleMode = False
-                            else:
-                                randAttacks = ["SCRATCH", "THUNDERBOLT", "ELECTROCUTE", "MURDER", "JAIL"]
+                    elif lowmessage == "items":
+                        bot.sendMessage(chat_id=chatId, text="You have no items")
 
-                                attackChoiceNum = random.randint(0, len(randAttacks)-1)
-                                attackChoice = randAttacks[attackChoiceNum]
-                                bot.sendMessage(chat_id=chatId, text="Enemy {0} used {1}!".format(nameChoice, attackChoice))
-                                result2 = random.randint(1,2)
-                                time.sleep(1)
-                                if result2 == 1:
-                                    bot.sendMessage(chat_id=chatId, text="It was super effective!")
-                                elif result2 == 2:
-                                    bot.sendMessage(chat_id=chatId, text="Critical hit!")
-                                time.sleep(1)
-                                bot.sendMessage(chat_id=chatId, text="{} fainted!".format(firstname.upper()))
-                                time.sleep(1)
-                                bot.sendMessage(chat_id=chatId, text="{} won!".format(nameChoice))
-                                fightMode = False
-                                battleMode = False
+                    elif lowmessage == "pkmn" or lowmessage == "pokemon":
+                        bot.sendMessage(chat_id=chatId, text="You don't have any other pokemans")
 
+                    else:
+                        bot.sendMessage(chat_id=chatId, text="*BEEP*")
+                        
                 # enable ed mode and initialize the various ed modes
                 elif cmd(b'ed', msg):
                     global editedtext
