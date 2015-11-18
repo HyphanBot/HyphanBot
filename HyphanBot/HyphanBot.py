@@ -55,9 +55,11 @@ def main():
 
     global r
     global oldtitle
+    global oldchatid
 
     # foo
     oldtitle = ""
+    oldchatid = ""
     
     # set the bot name
     botName = "Hyphan"
@@ -285,6 +287,7 @@ def getMsg(bot):
 
     global r
     global oldtitle
+    global oldchatid
     
     # a simple recursive function to repeats a message X amounts of time.
     if announceStart:
@@ -304,10 +307,24 @@ def getMsg(bot):
             msg = update.message.text.encode('utf-8')
             message = msg.decode("utf-8")
 
-            if oldtitle != update.message.chat.title and len(oldtitle) != 0:
+            print(update)
+            if oldtitle != update.message.chat.title and len(oldtitle) != 0 and chatId == oldchatid:
                 bot.sendMessage(chat_id=chatId, text="Why did you change the name to {}, eh.".format(update.message.chat.title))
 
             oldtitle = update.message.chat.title
+            oldchatid = chatId
+
+            # sillyness
+            foo = len(message) - 3
+            bar = len(message) - 2
+            if message[foo:] != "..." and message[bar:] == "..":
+                bot.sendMessage(chat_id=chatId, text="Three dots Nick")
+
+            print(foo)
+            print(bar)
+            print(message[foo:])
+            print(message[bar:])
+            print(len(message))
             # get the name, firstname and nickname of the user
             user = update.message.from_user.username
             firstname = update.message.from_user.first_name
