@@ -320,11 +320,6 @@ def getMsg(bot):
             if message[foo:] != "..." and message[bar:] == "..":
                 bot.sendMessage(chat_id=chatId, text="Three dots Nick")
 
-            print(foo)
-            print(bar)
-            print(message[foo:])
-            print(message[bar:])
-            print(len(message))
             # get the name, firstname and nickname of the user
             user = update.message.from_user.username
             firstname = update.message.from_user.first_name
