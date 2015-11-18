@@ -56,10 +56,16 @@ def main():
     global r
     global oldtitle
     global oldchatid
-
+    global oldmessage
+    global doubledot
+    global counter
+    
     # foo
     oldtitle = ""
     oldchatid = ""
+    oldmessage = ""
+    doubledot = 0
+    counter = 0
     
     # set the bot name
     botName = "Hyphan"
@@ -288,6 +294,9 @@ def getMsg(bot):
     global r
     global oldtitle
     global oldchatid
+    global oldmessage
+    global doubledot
+    global counter
     
     # a simple recursive function to repeats a message X amounts of time.
     if announceStart:
@@ -313,13 +322,23 @@ def getMsg(bot):
 
             oldtitle = update.message.chat.title
             oldchatid = chatId
-
+            
             # sillyness
             foo = len(message) - 3
             bar = len(message) - 2
-            if message[foo:] != "..." and message[bar:] == "..":
+            if message[foo:] != "..." and message[bar:] == ".." and len(message) > 2 and oldmessage != message and doubledot < 3:
                 bot.sendMessage(chat_id=chatId, text="Three dots Nick")
+                global doubledot
+                doubledot += 1
 
+            if counter == 100:
+                counter = 0
+                doubledot = 0
+            else:
+                counter += 1
+            
+            print(doubledot)
+            oldmessage = message
             # get the name, firstname and nickname of the user
             user = update.message.from_user.username
             firstname = update.message.from_user.first_name
@@ -340,8 +359,7 @@ def getMsg(bot):
             if (msg):
                 debug = "[{0}] {1} ({2}, {3}): {4}".format(chatId, firstname, nickname, user, message)
                 print(debug)
-
-                # darude sandstorm
+               # darude sandstorm
                 darude = random.randint(1, 1000)
                 if darude == 743:
                     bot.sendMessage(chat_id=chatId, text="https://www.youtube.com/watch?v=y6120QOlsfU")
