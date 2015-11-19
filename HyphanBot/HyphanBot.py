@@ -316,9 +316,12 @@ def getMsg(bot):
             msg = update.message.text.encode('utf-8')
             message = msg.decode("utf-8")
 
-            print(update)
+            #print(update)
             if oldtitle != update.message.chat.title and len(oldtitle) != 0 and chatId == oldchatid:
-                bot.sendMessage(chat_id=chatId, text="Why did you change the name to {}, eh.".format(update.message.chat.title))
+                debug = "[{0}] Group chat name changed from '{1}' to '{2}'".format(chatId, oldtitle, update.message.chat.title)
+                print(debug)
+                # This sounds like Maxi.
+                #bot.sendMessage(chat_id=chatId, text="Why did you change the name to {}, eh.".format(update.message.chat.title))
 
             oldtitle = update.message.chat.title
             oldchatid = chatId
@@ -327,7 +330,7 @@ def getMsg(bot):
             foo = len(message) - 3
             bar = len(message) - 2
             if message[foo:] != "..." and message[bar:] == ".." and len(message) > 2 and oldmessage != message and doubledot < 3:
-                bot.sendMessage(chat_id=chatId, text="Three dots Nick")
+                bot.sendMessage(chat_id=chatId, text="Three dots, Nick.")
                 global doubledot
                 doubledot += 1
 
@@ -380,6 +383,9 @@ def getMsg(bot):
                 if ("syntax error" in msg.decode('utf-8').lower()):
                     bot.sendMessage(chat_id=chatId, text="Syntax error")
 
+                pokemon_options = [[ "FIGHT", "PKMN" ], [ "ITEMS", "RUN" ]]
+                pokemon_attack = [[ "SCRATCH", "PUNCH" ], [ "KICK", "JUMP" ]]
+
                 # return nothing
                 if cmd(b'help', msg):
                     global pokeman
@@ -391,8 +397,9 @@ def getMsg(bot):
                     global enemy_dexterity
                     
                     if not popocmd:
-                        egg = 42
-                        if egg == 42:
+                        egg = 42 # For testing purposes.
+                        #egg = random.randint(1,50)
+                        if egg == 42: # Look ma, I found some rare Pokemon!!
                             pokeman = True
                             chatided = chatId
                             battleMode = True
@@ -406,8 +413,10 @@ def getMsg(bot):
                             nameChoice = randNames[nameChoiceNum]
                             bot.sendMessage(chat_id=chatId, text="Wild {} appeared!".format(nameChoice))
                             bot.sendMessage(chat_id=chatId, text="Go, {}!".format(firstname.upper()))
-                            bot.sendMessage(chat_id=chatId, text="What will {} do?\n /FIGHT /PKMN\n /ITEMS /RUN".format(firstname.upper()))
+                            pokemon_keyboard = telegram.ReplyKeyboardMarkup(pokemon_options)
+                            bot.sendMessage(chat_id=chatId, text="What will {} do?\n /FIGHT /PKMN\n /ITEMS /RUN".format(firstname.upper()), reply_markup=pokemon_keyboard)
                         else:
+                            update.message.new_chat_title = "Hyphan waz here!"
                             bot.sendMessage(chat_id=chatId, text="?")
                     popocmd = False
 
@@ -467,22 +476,28 @@ def getMsg(bot):
                             run = False
                             
                         if run == True:
-                            bot.sendMessage(chat_id=chatId, text="{0} used {1}!".format(firstname.upper(), lowmessage.upper()))
+                            pokemon_keyboard = telegram.ReplyKeyboardHide()
+                            bot.sendMessage(chat_id=chatId, text="{0} used {1}!".format(firstname.upper(), lowmessage.upper()), reply_markup=pokemon_keyboard)
                             bot.sendMessage(chat_id=chatId, text=effectiveness)
                         
                             enemy_hp = enemy_hp - result
                             bot.sendMessage(chat_id=chatId, text="{0} took {1} HP damage! He has {2} HP left!".format(nameChoice.upper(), result, enemy_hp))
 
                             if enemy_hp <= 0:
-                                bot.sendMessage(chat_id=chatId, text="{} fainted!".format(nameChoice.upper()))
+                                pokemon_keyboard = telegram.ReplyKeyboardHide()
+                                bot.sendMessage(chat_id=chatId, text="{} fainted!".format(nameChoice.upper()), reply_markup=pokemon_keyboard)
                                 fightMode = False
                                 pokeman = False
                             else:
-                                bot.sendMessage(chat_id=chatId, text="This is going to do something!")
+                                pokemon_keyboard = telegram.ReplyKeyboardHide()
+                                #bot.sendMessage(chat_id=chatId, text="This is going to do something!")
                                 randAttacks = ["scratch", "watercannon", "harden", "tackle"]
                                 randChoose = random.randint(0, len(randAttacks) - 1)
+                                attackChoice = randAttacks[randChoose]
+
+                                bot.sendMessage(chat_id=chatId, text="{0} used {1}!".format(nameChoice, attackChoice.upper()))
                                 
-                                if randAttacks[randChoose] == "scratch":
+                                if attackChoice == "scratch":
                                     result = random.randint(0,5)
                                     enemy_dexterity = enemy_dexterity - 3
 
@@ -495,7 +510,7 @@ def getMsg(bot):
                                     else:
                                         effectiveness = "It's mediocre, just like your mom"
                                         
-                                elif randAttacks[randChoose] == "watercannon":
+                                elif attackChoice == "watercannon":
                                     result = random.randint(7,15)
                                     enemy_dexterity = enemy_dexterity - 15
                                     
@@ -508,13 +523,13 @@ def getMsg(bot):
                                     else:
                                         effectiveness = "It's mediocre, just like your mom"
 
-                                elif randAttacks[randChoose] == "harden":
+                                elif attackChoice == "harden":
                                     result = 0
                                     enemy_dexterity = enemy_dexterity - 1
 
                                     effectiveness = "Honestly what did you expect to happen?"
 
-                                elif randAttacks[randChoose] == "tackle":
+                                elif attackChoice == "tackle":
                                     result = random.randint(0,10)
                                     enemy_dexterity = enemy_dexterity - 6
 
@@ -529,23 +544,30 @@ def getMsg(bot):
                                 else:
                                     bot.sendMessage(chat_id=chatId, text="Something went horribly wrong...")
 
-                                    bot.sendMessage(chat_id=chatId, text="{0} used {1}!".format(nameChoice, randAttacks[randChoose].upper()))
-                                    bot.sendMessage(chat_id=chatId, text=effectiveness)
+                                    #bot.sendMessage(chat_id=chatId, text="{0} used {1}!".format(nameChoice, randAttacks[randChoose].upper()))
+                                bot.sendMessage(chat_id=chatId, text=effectiveness)
                                     
-                                    hp = hp - result
-                                    bot.sendMessage(chat_id=chatId, text="{0} took {1} HP damage! He has {2} HP left!".format(firstname.upper(), result, hp))
+                                hp = hp - result
+                                bot.sendMessage(chat_id=chatId, text="{0} took {1} HP damage! He has {2} HP left!".format(firstname.upper(), result, hp))
 
-                                    if hp <= 0:
-                                        bot.sendMessage(chat_id=chatId, text="Game over!")
-                                        fightMode = False
-                                        pokeman = False
+                                if hp <= 0:
+                                    pokemon_keyboard = telegram.ReplyKeyboardHide()
+                                    bot.sendMessage(chat_id=chatId, text="Game over!", reply_markup=pokemon_keyboard)
+                                    fightMode = False
+                                    pokeman = False
+                                else:
+                                    fightMode = False
+                                    pokemon_keyboard = telegram.ReplyKeyboardMarkup(pokemon_options)
+                                    bot.sendMessage(chat_id=chatId, text="What will {} do?\n /FIGHT /PKMN\n /ITEMS /RUN".format(firstname.upper()), reply_markup=pokemon_keyboard)
                                 
                     elif lowmessage == "fight":
-                        bot.sendMessage(chat_id=chatId, text="SCRATCH\nPNCH\nKICK\nJUMP")
+                        pokemon_keyboard = telegram.ReplyKeyboardMarkup(pokemon_attack)
+                        bot.sendMessage(chat_id=chatId, text="SCRATCH\nPUNCH\nKICK\nJUMP", reply_markup=pokemon_keyboard)
                         fightMode = True
 
                     elif lowmessage == "run":
-                        bot.sendMessage(chat_id=chatId, text="Got away safely!")
+                        pokemon_keyboard = telegram.ReplyKeyboardHide()
+                        bot.sendMessage(chat_id=chatId, text="Got away safely!", reply_markup=pokemon_keyboard)
                         pokeman = False
 
                     elif lowmessage == "items":
