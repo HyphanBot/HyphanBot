@@ -58,6 +58,13 @@ docs/_build/
 # PyBuilder
 target/
 
+# OpenShift
+.openshift/
+requirements.txt
+setup.py
+wsgi.py
+bootstrap.py
+
 # misc stuff we added
 *bak
 *~
