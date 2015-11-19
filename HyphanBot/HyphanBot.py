@@ -317,14 +317,15 @@ def getMsg(bot):
             message = msg.decode("utf-8")
 
             #print(update)
-            if oldtitle != update.message.chat.title and len(oldtitle) != 0 and chatId == oldchatid:
-                debug = "[{0}] Group chat name changed from '{1}' to '{2}'".format(chatId, oldtitle, update.message.chat.title)
-                print(debug)
-                # This sounds like Maxi.
-                #bot.sendMessage(chat_id=chatId, text="Why did you change the name to {}, eh.".format(update.message.chat.title))
+            if chatId < 0:
+                if oldtitle != update.message.chat.title and len(oldtitle) != 0 and chatId == oldchatid:
+                    debug = "[{0}] Group chat name changed from '{1}' to '{2}'".format(chatId, oldtitle, update.message.chat.title)
+                    print(debug)
+                    # This sounds like Maxi.
+                    #bot.sendMessage(chat_id=chatId, text="Why did you change the name to {}, eh.".format(update.message.chat.title))
 
-            oldtitle = update.message.chat.title
-            oldchatid = chatId
+                oldtitle = update.message.chat.title
+                oldchatid = chatId
             
             # sillyness
             foo = len(message) - 3
@@ -340,7 +341,7 @@ def getMsg(bot):
             else:
                 counter += 1
             
-            print(doubledot)
+            #print(doubledot)
             oldmessage = message
             # get the name, firstname and nickname of the user
             user = update.message.from_user.username
@@ -777,7 +778,7 @@ def getMsg(bot):
                     
                     if arg1 == "":
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
-                        bot.sendMessage(chat_id=chatId, text="Who do you want me to send a message to? Format:\n/pm <username> <message>")
+                        bot.sendMessage(chat_id=chatId, text="Who do you want me to send a message to? (username is case-sensitive) Format:\n/pm <username> <message>")
                     else:
                         bot.sendChatAction(chat_id=chatId, action=telegram.ChatAction.TYPING)
                         args = arg1.split(" ")
@@ -785,7 +786,7 @@ def getMsg(bot):
                             if getRegistry(args[0]):
                                 bot.sendMessage(chat_id=chatId, text="What message do you want me to send to "+args[0]+"? Format:\n/pm "+args[0]+" <message>")
                             else:
-                                bot.sendMessage(chat_id=chatId, text="Sorry to tell you this, but the user you're trying to send a message to is not registered with me.\nWho else do you want me to send a message to? Format:\n/pm <username> <message>")
+                                bot.sendMessage(chat_id=chatId, text="Sorry to tell you this, but the user you're trying to send a message to is not registered with me.\nWho else do you want me to send a message to? (username is case-sensitive) Format:\n/pm <username> <message>")
                         else:
                             recipientId = getRegistry(args[0])
                             if recipientId:
@@ -795,6 +796,7 @@ def getMsg(bot):
                                     for x in unsorted:
                                         pmsg = pmsg + " " + x
                                     bot.sendMessage(chat_id=recipientId, text="PM from "+update.message.from_user.first_name+" ("+user+"):\n" + pmsg + "\n[To reply to this message, use: /pm "+user+" <your reply> ]")
+                                    bot.sendMessage(chat_id=chatId, text="PM sent to {}.".format(args[0]))
                                 else:
                                     bot.sendMessage(chat_id=chatId, text="Sorry, I can't send a private message to a group.")
                             else:
