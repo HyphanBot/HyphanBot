@@ -412,7 +412,9 @@ def getMsg(bot):
                             nameChoiceNum = random.randint(0, len(randNames) - 1)
                             nameChoice = randNames[nameChoiceNum]
                             bot.sendMessage(chat_id=chatId, text="Wild {} appeared!".format(nameChoice))
+                            time.sleep(1)
                             bot.sendMessage(chat_id=chatId, text="Go, {}!".format(firstname.upper()))
+                            time.sleep(1)
                             pokemon_keyboard = telegram.ReplyKeyboardMarkup(pokemon_options)
                             bot.sendMessage(chat_id=chatId, text="What will {} do?\n /FIGHT /PKMN\n /ITEMS /RUN".format(firstname.upper()), reply_markup=pokemon_keyboard)
                         else:
@@ -478,13 +480,16 @@ def getMsg(bot):
                         if run == True:
                             pokemon_keyboard = telegram.ReplyKeyboardHide()
                             bot.sendMessage(chat_id=chatId, text="{0} used {1}!".format(firstname.upper(), lowmessage.upper()), reply_markup=pokemon_keyboard)
+                            time.sleep(1)
                             bot.sendMessage(chat_id=chatId, text=effectiveness)
                         
                             enemy_hp = enemy_hp - result
+                            time.sleep(1)
                             bot.sendMessage(chat_id=chatId, text="{0} took {1} HP damage! He has {2} HP left!".format(nameChoice.upper(), result, enemy_hp))
 
                             if enemy_hp <= 0:
                                 pokemon_keyboard = telegram.ReplyKeyboardHide()
+                                time.sleep(1)
                                 bot.sendMessage(chat_id=chatId, text="{} fainted!".format(nameChoice.upper()), reply_markup=pokemon_keyboard)
                                 fightMode = False
                                 pokeman = False
@@ -545,19 +550,23 @@ def getMsg(bot):
                                     bot.sendMessage(chat_id=chatId, text="Something went horribly wrong...")
 
                                     #bot.sendMessage(chat_id=chatId, text="{0} used {1}!".format(nameChoice, randAttacks[randChoose].upper()))
+                                time.sleep(1)
                                 bot.sendMessage(chat_id=chatId, text=effectiveness)
                                     
                                 hp = hp - result
+                                time.sleep(1)
                                 bot.sendMessage(chat_id=chatId, text="{0} took {1} HP damage! He has {2} HP left!".format(firstname.upper(), result, hp))
 
                                 if hp <= 0:
                                     pokemon_keyboard = telegram.ReplyKeyboardHide()
+                                    time.sleep(1)
                                     bot.sendMessage(chat_id=chatId, text="Game over!", reply_markup=pokemon_keyboard)
                                     fightMode = False
                                     pokeman = False
                                 else:
                                     fightMode = False
                                     pokemon_keyboard = telegram.ReplyKeyboardMarkup(pokemon_options)
+                                    time.sleep(1)
                                     bot.sendMessage(chat_id=chatId, text="What will {} do?\n /FIGHT /PKMN\n /ITEMS /RUN".format(firstname.upper()), reply_markup=pokemon_keyboard)
                                 
                     elif lowmessage == "fight":
