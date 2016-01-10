@@ -7,6 +7,7 @@ from os.path import expanduser
 
 import logging
 import pathlib
+import notify2
 
 # Log everything
 logging.basicConfig(
@@ -16,8 +17,9 @@ logger = logging.getLogger(__name__)
 
 def error(bot, update, error):
         logger.warn('Error occured in update, "%s": %s' % (update, error))
+        notify2.Notification("Error occured in update '%s': '%s'" % (update, error)) 
 
-def start_bot():
+def init_config():
         HOME            = expanduser("~")
         XDG_CONFIG      = HOME + '/.config/hyphan/config.ini'
         CONFIG_FALLBACK = HOME + '~/.hyphan/config.ini'
@@ -34,7 +36,7 @@ def start_bot():
         else:
            print("No configuration file has been found")
            answer = input("Do you want me to copy the standard boiler plate to ~/.config/hyphan/config.ini? [Y/n] ")
-           if not answer.lower() == "n":
+           if not answer.lower() == "n" or answer.lower() == "no":
                 answer = input("Do you want to enter the info interactively? [Y/n] ")
                 if not answer.lower() == "n":
                         mkdir(HOME + '/.config/hyphan')
@@ -57,8 +59,13 @@ admins          = foobarbaz"""))
                         writefile.close()
                         print("Don't forget to edit the file before you start the program again!")
            quit()
-               
-        config.read('config.ini')
+        return config
+
+def start_bot():
+        config          = init_config()
+        token           = config.get("general", "token")
+        botname         = config.get("general", "botname")
+        friendlyBotName = config.get("general", "friendlybotname")
 
         token           = config.get("general", "token")
         botname         = config.get("general", "botname")
@@ -69,6 +76,11 @@ admins          = foobarbaz"""))
 
         api = HyphanAPI(updater)
 
+        # Notify that the bot started
+        notify2.init(friendlyBotName)
+        notify2.Notification("Initialized {}".format(friendlyBotName),
+                             "{} has started".format(friendlyBotName),
+                             "notification-message-im").show()
         # Dispatch modules
         dp = updater.dispatcher
         loadModules(api, updater, logger)

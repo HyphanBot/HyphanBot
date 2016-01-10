@@ -14,39 +14,65 @@ You should have received a copy of the GNU Afferno General Public
 License along with Hyphan.  If not, see 
 https://www.gnu.org/licenses/agpl-3.0.html>.
 '''
-import main
-from configparser import SafeConfigParser
-
 """
 This module contains the HyphanAPI class which intends to provide api 
 for Hyphan's mods.
 """
+from os import mkdir
+from os.path import expanduser
+from configparser import SafeConfigParser
+
+import pathlib
+import main
 
 class HyphanAPI:
-	"""
-	This class provides API for making Hyphan mods communicate better 
-	with the internal core of Hyphan and the Telegram bot module.
+        """
+        This class provides API for making Hyphan mods communicate better 
+        with the internal core of Hyphan and the Telegram bot module.
 
-	Args:
-		updater (telegram.Updater): The updater object that could be 
-			used in mods.
-	"""
-	def __init__(self, updater):
-		self.updater = updater
-		self.main    = main
+        Args:
+                updater (telegram.Updater): The updater object that could be 
+                        used in mods.
+        """
+        def __init__(self, updater):
+                self.updater = updater
+                self.main    = main
 
-	''' fucking broken piece of shit...
-	def restart_bot(self):
-		self.updater.stop()
-		time.sleep(1)
-		main.start_bot()
-	'''
+        ''' fucking broken piece of shit...
+        def restart_bot(self):
+                self.updater.stop()
+                time.sleep(1)
+                main.start_bot()
+        '''
 
-	def get_admins(self):
-		config = SafeConfigParser()
-		config.read('config.ini')
-		
-		return config.get("general", "admins").split()
-		
-	def get_updater(self):
-		return self.updater
+        def get_admins(self):
+                return self.config("general", "admins").split()
+                
+        def get_updater(self):
+                return self.updater
+
+        def config(self, section, key):
+                HOME            = expanduser("~")
+                XDG_CONFIG      = HOME + '/.config/hyphan/config.ini'
+                CONFIG_FALLBACK = HOME + '~/.hyphan/config.ini'
+                LAST_HOPE       = HOME + '~/.hyphanrc'
+
+                safeconfig = SafeConfigParser()
+                
+                if pathlib.Path(XDG_CONFIG).exists():
+                        safeconfig.read(XDG_CONFIG)
+                elif pathlib.Path(CONFIG_FALLBACK).exists():
+                        safeconfig.read(CONFIG_FALLBACK)
+                elif pathlib.Path(LAST_HOPE).exists():
+                        safeconfig.read(LAST_HOPE)
+
+                try:
+                        safeconfig.get(section, key)
+                except Exception:
+                        print("Hyphan couldn't find that value!\n")
+                else:
+                        return safeconfig.get(section, key)
+
+                
+
+
