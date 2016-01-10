@@ -14,8 +14,8 @@ You should have received a copy of the GNU Afferno General Public
 License along with Hyphan.  If not, see 
 https://www.gnu.org/licenses/agpl-3.0.html>.
 '''
-
 import main
+from configparser import SafeConfigParser
 
 """
 This module contains the HyphanAPI class which intends to provide api 
@@ -43,8 +43,10 @@ class HyphanAPI:
 	'''
 
 	def get_admins(self):
-		# TODO: Get this from config.
-		return ["NerdyBuzz", "Faalentijn"]
+		config = SafeConfigParser()
+		config.read('config.ini')
+		
+		return config.get("general", "admins").split()
 		
 	def get_updater(self):
 		return self.updater
