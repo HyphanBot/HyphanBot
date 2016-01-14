@@ -18,7 +18,7 @@ def noslash(bot, update):
 	elif msg == "about":
 		about(bot, update)
 
-def dispatch(api, updater, logger):
+def dispatch(api, updater):
 	dp = updater.dispatcher
 
 	dp.addTelegramCommandHandler("help", help_cmd)

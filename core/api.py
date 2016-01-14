@@ -14,16 +14,18 @@ You should have received a copy of the GNU Afferno General Public
 License along with Hyphan.  If not, see 
 https://www.gnu.org/licenses/agpl-3.0.html>.
 '''
+
+from os import mkdir
+from os.path import expanduser
+
+import pathlib
+import main
+import logging
+
 """
 This module contains the HyphanAPI class which intends to provide api 
 for Hyphan's mods.
 """
-from os import mkdir
-from os.path import expanduser
-from configparser import SafeConfigParser
-
-import pathlib
-import main
 
 class HyphanAPI:
         """
@@ -33,10 +35,14 @@ class HyphanAPI:
         Args:
                 updater (telegram.Updater): The updater object that could be 
                         used in mods.
+                config      (Configurator): The configuration object that is
+                        used to parse and access the configuration file.
         """
-        def __init__(self, updater):
+        def __init__(self, updater, config):
                 self.updater = updater
                 self.main    = main
+                self.config  = config
+                self.logger  = logging.getLogger(__name__)
 
         ''' fucking broken piece of shit...
         def restart_bot(self):
@@ -46,32 +52,43 @@ class HyphanAPI:
         '''
 
         def get_admins(self):
-                return self.config("general", "admins").split()
+                return self.config.parse_general()['adminlist']
+
+        def is_admin(self, username):
+                return username in self.get_admins()
+
+        def is_sender_admin(self, update):
+                return self.is_admin(update.message.from_user.username)
                 
         def get_updater(self):
                 return self.updater
 
-        def config(self, section, key):
-                HOME            = expanduser("~")
-                XDG_CONFIG      = HOME + '/.config/hyphan/config.ini'
-                CONFIG_FALLBACK = HOME + '~/.hyphan/config.ini'
-                LAST_HOPE       = HOME + '~/.hyphanrc'
+        class Mod:
+                """
+                This class identifies the actual mod.
 
-                safeconfig = SafeConfigParser()
-                
-                if pathlib.Path(XDG_CONFIG).exists():
-                        safeconfig.read(XDG_CONFIG)
-                elif pathlib.Path(CONFIG_FALLBACK).exists():
-                        safeconfig.read(CONFIG_FALLBACK)
-                elif pathlib.Path(LAST_HOPE).exists():
-                        safeconfig.read(LAST_HOPE)
+                Args:
+                        api  (HyphanAPI): The base api the mod will use.
+                        name    (string): The name of the mod.
+                """
+                def __init__(self, api, name):
+                        self.api  = api
+                        self.name = name
+                        self.logger  = logging.getLogger(__name__)
 
-                try:
-                        safeconfig.get(section, key)
-                except Exception:
-                        print("Hyphan couldn't find that value!\n")
-                else:
-                        return safeconfig.get(section, key)
+                def get_config(self, key=None):
+                        if self.name not in self.api.config.get_sections():
+                                self.logger.warn("Missing config section for mod '%s'" % self.name)
+                                return False
+                        else:
+                                return self.api.config.access(self.name, key)
+
+                def set_config(self, data):
+                        if self.api.config.append(self.name, data):
+                                return True
+                        else:
+                                return False
+
 
                 
 

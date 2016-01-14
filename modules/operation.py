@@ -12,7 +12,7 @@ def quit(bot, update):
         global botApi
         
         terminate = False
-        for admin in botApi.get_admins(): # Get a list of admins from the API
+        for admin in botApi.api.get_admins(): # Get a list of admins from the API
                 print(admin)
                 # If the username is in the admin list, quit the bot
                 if update.message.from_user.username == admin:
@@ -27,7 +27,7 @@ def quit(bot, update):
 def restart(bot, update):
         global botApi
 
-        for admin in botApi.get_admins():
+        for admin in botApi.api.get_admins():
                 # If the username is in the admin list, restart the bot
                 # Will only restart if the bot is running from the launcher script.
                 if update.message.from_user.username == admin:
@@ -45,7 +45,7 @@ def noslash(bot, update):
         elif msg == "restart":
                 restart(bot, update)
 
-def dispatch(api, updater, logger):
+def dispatch(api, updater):
         global botController
         global botApi
 

@@ -15,7 +15,7 @@ global botApi
 # function when the command is executed. The message will come from the
 # configuration file.
 def hello(bot, update):
-        bot.sendMessage(chat_id=update.message.chat_id, text="{}".format(botApi.config("hello", "message")))
+        bot.sendMessage(chat_id=update.message.chat_id, text="{}".format(botApi.get_config("message")))
 
 # A mod can also dispatch more than one command.
 # The following is an example of a function that gets called when another
@@ -42,13 +42,21 @@ def noslash(bot, update, args):
         
 # Dispatch function. This is required by every mod as it is called by the
 # dispatcher in Hyphan's core.
-def dispatch(api, updater, logger):
+def dispatch(api, updater):
         # make the api usable in the entire file
         global botApi
         botApi = api
 
+        if not botApi.get_config():
+                default_keys = {
+                        "enabled": "yes",
+                        "message": "Hello!"
+                }
+                
+                botApi.set_config(default_keys)
+
         # check if the module is enabled
-        if api.config("hello", "enabled") == "yes":
+        if botApi.get_config("enabled") == "yes":
                 # Get dispatcher
                 dp = updater.dispatcher
                 

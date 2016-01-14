@@ -1,98 +1,50 @@
 from telegram import Update, Bot, Updater
+from configurator import *
 from dispatcher import *
 from api import *
-from configparser import SafeConfigParser
-from os import mkdir
-from os.path import expanduser
 
 import logging
-import pathlib
 import notify2
+import os
+
+# Get Hyphan's root directory from the environment variable (exported in run.sh)
+HYPHAN_DIR = os.getenv('HYPHAN_DIR', "/hyphan")
 
 # Log everything
 logging.basicConfig(
         format='%(asctime)s - %(name)s [%(levelname)s]: %(message)s',
-        level=logging.INFO)
+        level=logging.INFO) # change this to logging.WARNING to disable debugging.
 logger = logging.getLogger(__name__)
 
 def error(bot, update, error):
         logger.warn('Error occured in update, "%s": %s' % (update, error))
         notify2.Notification("Error occured in update '%s': '%s'" % (update, error)) 
 
-def init_config():
-        HOME            = expanduser("~")
-        XDG_CONFIG      = HOME + '/.config/hyphan/config.ini'
-        CONFIG_FALLBACK = HOME + '~/.hyphan/config.ini'
-        LAST_HOPE       = HOME + '~/.hyphanrc'
-
-        config = SafeConfigParser()
-        
-        if pathlib.Path(XDG_CONFIG).exists():
-           config.read(XDG_CONFIG)
-        elif pathlib.Path(CONFIG_FALLBACK).exists():
-           config.read(CONFIG_FALLBACK)
-        elif pathlib.Path(LAST_HOPE).exists():
-           config.read(LAST_HOPE)
-        else:
-           print("No configuration file has been found")
-           answer = input("Do you want me to copy the standard boiler plate to ~/.config/hyphan/config.ini? [Y/n] ")
-           if not answer.lower() == "n" or answer.lower() == "no":
-                answer = input("Do you want to enter the info interactively? [Y/n] ")
-                if not answer.lower() == "n":
-                        mkdir(HOME + '/.config/hyphan')
-                        writefile = open(XDG_CONFIG, "w")
-                        botname   = input("What is the official botname? ")
-                        friendly  = input("What is a friendly name for the bot? ")
-                        token     = input("What is the Telegram token? ")
-                        admins    = input("Who are the admins? ")
-                        writefile.write(str("[general]\nBotname         = {0}\nfriendlyBotName = {1}\ntoken           = {2}\nadmins          = {3}".format(botname, friendly, token, admins)))
-                        writefile.close()
-                else:
-                        mkdir(HOME + '/.config/hyphan')
-                        writefile = open(XDG_CONFIG, "w")
-                        writefile.write(str(
-"""[general]
-Botname         = foo
-friendlyBotName = bar
-token           = baz
-admins          = foobarbaz"""))
-                        writefile.close()
-                        print("Don't forget to edit the file before you start the program again!")
-           quit()
-        return config
-
 def start_bot():
-        config          = init_config()
-        token           = config.get("general", "token")
-        botname         = config.get("general", "botname")
-        friendlyBotName = config.get("general", "friendlybotname")
+        # Initialize config
+        config = Configurator()
+        generalconfig = config.parse_general()
 
-        token           = config.get("general", "token")
-        botname         = config.get("general", "botname")
-        friendlyBotName = config.get("general", "friendlybotname")
-
-        updater = Updater(token)
+        updater = Updater(generalconfig['token'])
         getBot  = updater.bot.getMe()
 
-        api = HyphanAPI(updater)
+        api = HyphanAPI(updater, config)
 
-        # Notify that the bot started
-        notify2.init(friendlyBotName)
-        notify2.Notification("Initialized {}".format(friendlyBotName),
-                             "{} has started".format(friendlyBotName),
-                             "notification-message-im").show()
         # Dispatch modules
         dp = updater.dispatcher
-        loadModules(api, updater, logger)
+        loadModules(api, updater)
         dp.addErrorHandler(error)
 
         # Start the bot
         updater.start_polling()
+
+        # Notify that the bot started
+        notify2.init(getBot.username)
+        notify2.Notification("Initialized {}".format(getBot.first_name),
+            "{} has started".format(getBot.username), "notification-message-im").show()
         logger.info("Initialized %s (%s)." % (getBot.first_name, getBot.username))
+
         updater.idle()
 
-def main():
-        start_bot()
-
 if __name__ == '__main__':
-        main()
+        start_bot()
