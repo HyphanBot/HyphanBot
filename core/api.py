@@ -81,7 +81,10 @@ class HyphanAPI:
                                 self.logger.warn("Missing config section for mod '%s'" % self.name)
                                 return False
                         else:
-                                return self.api.config.access(self.name, key)
+                                if not key == None:
+                                        return self.api.config.access(self.name, key)
+                                else:
+                                        return True
 
                 def set_config(self, data):
                         return self.api.config.append(self.name, data)

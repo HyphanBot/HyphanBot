@@ -11,22 +11,23 @@ def getMods(logger):
         possibleMods = os.listdir(modDir) # List the contents of the mod directory
 
         for mod in possibleMods: # iterate through the list
-                if mod != "__pycache__":
-                        mainModule = "main" # Reset the variable to "main" for every loop
-                        modName = mod
-                        location = os.path.join(modDir, mod)
+                if mod == "__pycache__":
+                        continue
+                mainModule = "main" # Reset the variable to "main" for every loop
+                modName = mod
+                location = os.path.join(modDir, mod)
 
-                        # Check if the mod is not in its own directory and include it.
-                        if not os.path.isdir(location):
-                                if location.endswith(".py"):
-                                        location = modDir
-                                        modName = mod.split(".")[0]
-                                        mainModule = modName
-                                elif not mainModule+".py" in os.listdir(location): # If main.py is not found in the mod directory...
-                                        logger.warn("Not loading mod '%s': Entry point '%s.py' not found." % (mod, mainModule))
-                                        continue
-                                mods.append({ "name": modName, "path": location+"/"+mainModule+".py" })
-                                logger.info("Found mod '%s'." % modName)
+                # Check if the mod is not in its own directory and include it.
+                if not os.path.isdir(location):
+                        if location.endswith(".py"):
+                                location = modDir
+                                modName = mod.split(".")[0]
+                                mainModule = modName
+                elif not mainModule+".py" in os.listdir(location): # If main.py is not found in the mod directory...
+                        logger.warn("Not loading mod '%s': Entry point '%s.py' not found." % (mod, mainModule))
+                        continue
+                mods.append({ "name": modName, "path": location+"/"+mainModule+".py" })
+                logger.info("Found mod '%s'." % modName)
         return mods
 
 def loadMod(mod):
