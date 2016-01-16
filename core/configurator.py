@@ -81,8 +81,8 @@ admins  = admin1 admin2"""))
             "adminlist" : config.get("general", "admins").split(" ")
         }
 
-    def access(self, section, key):
-        return self.config.get(section, key)
+    def access(self, section, key, fallback=None):
+        return self.config.get(section, key, fallback=fallback)
 
     def append(self, section, data):
         if not section == "general":

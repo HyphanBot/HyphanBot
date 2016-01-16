@@ -1,4 +1,6 @@
 from importlib.machinery import *
+import importlib
+import sys
 import os
 
 # Gets and loads mods from the modules directory.
@@ -26,10 +28,19 @@ def getMods(logger):
                 elif not mainModule+".py" in os.listdir(location): # If main.py is not found in the mod directory...
                         logger.warn("Not loading mod '%s': Entry point '%s.py' not found." % (mod, mainModule))
                         continue
-                mods.append({ "name": modName, "path": location+"/"+mainModule+".py" })
+                mods.append({ "name": modName, "path": location+"/"+mainModule+".py", "main": mainModule })
                 logger.info("Found mod '%s'." % modName)
         return mods
 
 def loadMod(mod):
         # load the mod. This basically imports it.
         return SourceFileLoader(mod["name"], mod["path"]).load_module()
+
+def reloadMod(modName):
+        #try:
+                #modName = mod['name']
+                print(sys.modules[modName])
+                return importlib.reload(sys.modules[modName])
+        #except Exception:
+        #        print("Shit...")
+        #        return SourceFileLoader(mod["name"], mod["path"]).load_module()

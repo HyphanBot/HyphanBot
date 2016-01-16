@@ -76,13 +76,19 @@ class HyphanAPI:
                         self.name = name
                         self.logger  = logging.getLogger(__name__)
 
-                def get_config(self, key=None):
+                def section_exists(self):
+                        if self.name in self.api.config.get_sections():
+                                return True
+                        else:
+                                return False
+
+                def get_config(self, key=None, fallback=None):
                         if self.name not in self.api.config.get_sections():
                                 self.logger.warn("Missing config section for mod '%s'" % self.name)
                                 return False
                         else:
                                 if not key == None:
-                                        return self.api.config.access(self.name, key)
+                                        return self.api.config.access(self.name, key, fallback)
                                 else:
                                         return True
 
