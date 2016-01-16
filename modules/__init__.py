@@ -2,6 +2,6 @@
 
 import logging
 
-def dispatch(api, updater):
+def dispatch(mod, updater):
 	logger = logging.getLogger(__name__)
 	logger.info("Module loading initialized.")

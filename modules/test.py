@@ -9,13 +9,13 @@ confuse them with Python modules, since Hyphan is written in Python.
 The following code and comments describes the basic structure of how
 command mods work.
 '''
-global botApi
+global helloMod
 
 # Function that defines your mod. This will be called by your dispatch()
 # function when the command is executed. The message will come from the
 # configuration file.
 def hello(bot, update):
-        bot.sendMessage(chat_id=update.message.chat_id, text="{}".format(botApi.get_config("message")))
+        bot.sendMessage(chat_id=update.message.chat_id, text="{}".format(helloMod.get_config("message")))
 
 # A mod can also dispatch more than one command.
 # The following is an example of a function that gets called when another
@@ -37,26 +37,26 @@ def noslash(bot, update, args):
         
         if msg == "hello":
                 hello(bot, update)
-        elif msg == "goodbye":
+        elif msg.startswith("goodbye"):
                 goodbye(bot, update, args)
         
 # Dispatch function. This is required by every mod as it is called by the
 # dispatcher in Hyphan's core.
-def dispatch(api, updater):
+def dispatch(mod, updater):
         # make the api usable in the entire file
-        global botApi
-        botApi = api
+        global helloMod
+        helloMod = mod
 
-        if not botApi.get_config():
+        if not helloMod.get_config():
                 default_keys = {
                         "enabled": "yes",
                         "message": "Hello!"
                 }
-                
-                botApi.set_config(default_keys)
+
+                helloMod.set_config(default_keys)
 
         # check if the module is enabled
-        if botApi.get_config("enabled") == "yes":
+        if helloMod.get_config("enabled") == "yes":
                 # Get dispatcher
                 dp = updater.dispatcher
                 

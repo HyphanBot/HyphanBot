@@ -37,6 +37,7 @@ class Configurator:
                 if pathlib.Path(cfile).exists():
                     logger.info("Configuration file has been found at: " + cfile)
                     config.read(cfile)
+                    self.workingconfig = cfile
                     return config
 
             # Default config path
@@ -68,6 +69,10 @@ admins  = admin1 admin2"""))
                         print("Don't forget to edit the file before you start the program again!")
             sys.exit(2) # No such file or directory.
 
+    def refresh_config(self):
+        self.config = None
+        self.config = self.__init_config()
+
     def parse_general(self):
         config = self.config
         return {
@@ -82,6 +87,8 @@ admins  = admin1 admin2"""))
     def append(self, section, data):
         if not section == "general":
             self.config[section] = data
+            with open(self.workingconfig, 'w') as writefile:
+                self.config.write(writefile)
         else:
             return False
 

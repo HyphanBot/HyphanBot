@@ -84,10 +84,7 @@ class HyphanAPI:
                                 return self.api.config.access(self.name, key)
 
                 def set_config(self, data):
-                        if self.api.config.append(self.name, data):
-                                return True
-                        else:
-                                return False
+                        return self.api.config.append(self.name, data)
 
 
                 
