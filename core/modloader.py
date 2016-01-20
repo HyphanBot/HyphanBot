@@ -15,6 +15,8 @@ def getMods(logger):
         for mod in possibleMods: # iterate through the list
                 if mod == "__pycache__":
                         continue
+                elif mod[-1] == "~":
+                        continue
                 mainModule = "main" # Reset the variable to "main" for every loop
                 modName = mod
                 location = os.path.join(modDir, mod)
@@ -43,4 +45,4 @@ def reloadMod(modName):
                 return importlib.reload(sys.modules[modName])
         #except Exception:
         #        print("Shit...")
-        #        return SourceFileLoader(mod["name"], mod["path"]).load_module()
+        #        return SourceFileLoader(mod["name"], mod["path"]).load_module()o

@@ -35,7 +35,7 @@ class HyphanAPI:
         Args:
                 updater (telegram.Updater): The updater object that could be 
                         used in mods.
-                config      (Configurator): The configuration object that is
+                config  (Configurator): The configuration object that is
                         used to parse and access the configuration file.
         """
         def __init__(self, updater, config):
@@ -94,8 +94,3 @@ class HyphanAPI:
 
                 def set_config(self, data):
                         return self.api.config.append(self.name, data)
-
-
-                
-
-

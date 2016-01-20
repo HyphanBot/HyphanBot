@@ -15,7 +15,6 @@ def loadLoop(mlist, api, updater, reloadMods=False):
 			mod = reloadMod(i["main"])
 		else:
 			mod = loadMod(i) # Load the mod
-			print(sys.modules[i["name"]])
 		if "dispatch" in dir(mod): # Check if the dispatch function exists in the mod
 			modapi = api.Mod(api, mod.__name__)
 

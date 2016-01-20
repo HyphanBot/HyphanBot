@@ -11,10 +11,26 @@ import os
 HYPHAN_DIR = os.getenv('HYPHAN_DIR', "/hyphan")
 
 # Log everything
+# filter for the stupid shit python-telegram-bot reports
+class Filter(logging.Filter):
+        def filter(self, record):
+                message = record.getMessage()
+                if message == "No new updates found.":
+                        return False
+                elif message.endswith("webhook"):
+                        return False
+                else:
+                        return True
+
 logging.basicConfig(
         format='%(asctime)s - %(name)s [%(levelname)s]: %(message)s',
-        level=logging.INFO) # change this to logging.WARNING to disable debugging.
-logger = logging.getLogger(__name__)
+        level=logging.INFO) # change this to logging.INFO to enable verbose mode
+
+logger      = logging.getLogger(__name__)
+mainlog     = logging.getLogger("__main__")
+telegramlog = logging.getLogger("telegram.bot")
+telegramlog.addFilter(Filter())
+mainlog.addFilter(Filter())
 
 def error(bot, update, error):
         logger.warn('Error occured in update, "%s": %s' % (update, error))
@@ -25,7 +41,7 @@ def start_bot():
         config = Configurator()
         generalconfig = config.parse_general()
 
-        updater = Updater(generalconfig['token'])
+        updater = Updater(generalconfig['token'], workers=10)
         getBot  = updater.bot.getMe()
 
         api = HyphanAPI(updater, config)
@@ -35,7 +51,7 @@ def start_bot():
         loadModules(api, updater)
         dp.addErrorHandler(error)
 
-        # Start the bot
+        # Start the 
         updater.start_polling()
 
         # Notify that the bot started
