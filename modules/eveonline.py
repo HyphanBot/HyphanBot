@@ -80,10 +80,9 @@ def dispatch(mod, updater):
         }
 
         eveMod.set_config(default_keys)
-
-    if eveMod.get_config("enabled") == "yes":
-        dp = updater.dispatcher
-        dp.addTelegramCommandHandler("evealliance", getalliances)
-        dp.addTelegramCommandHandler("evechar", characters)
-        dp.addTelegramCommandHandler("evewallet", balance)
+    
+    dp = updater.dispatcher
+    dp.addTelegramCommandHandler("evealliance", getalliances)
+    dp.addTelegramCommandHandler("evechar", characters)
+    dp.addTelegramCommandHandler("evewallet", balance)
         

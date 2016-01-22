@@ -10,66 +10,65 @@ The following code and comments describes the basic structure of how
 command mods work.
 '''
 global helloMod
-
-# Function that defines your mod. This will be called by your dispatch()
-# function when the command is executed. The message will come from the
-# configuration file.
-def hello(bot, update):
-        bot.sendMessage(chat_id=update.message.chat_id, text="{}".format(helloMod.get_config("message")))
-
-# A mod can also dispatch more than one command.
-# The following is an example of a function that gets called when another
-# command is executed.
-def goodbye(bot, update, args):
-        bot.sendMessage(chat_id=update.message.chat_id, text="Goodbye {}!".format(''.join(args)))
-
-# The following handles commands that are executed without slashes at the
-# beginning.
-def stupid(bot, update, args):
-        msg = update.message.text.lower()
-
-        if msg == "stupid bot" or msg == "stupid bot!" or msg == "stupid bot.":
-                bot.sendMessage(chat_id=update.message.chat_id, text="Stupid human.")
-
-def noslash(bot, update, args):
-        # get the message
-        msg = update.message.text.lower()
         
-        if msg == "hello":
-                hello(bot, update)
-        elif msg.startswith("goodbye"):
-                goodbye(bot, update, args)
-        
-# Dispatch function. This is required by every mod as it is called by the
-# dispatcher in Hyphan's core.
+# Dispatch function. This is the core of every mod.
+# This is what Hyphan calls to initialize the mod.
 def dispatch(mod, updater):
-        # make the api usable in the entire file
-        global helloMod
-        helloMod = mod
 
-        if not helloMod.get_config():
+        # Function that defines your mod. This will be called when the command
+        # is executed.
+        # In this example, the message will be provided from the configuration file.
+        def hello(bot, update):
+                bot.sendMessage(chat_id=update.message.chat_id, text="{}".format(mod.get_config("message")))
+
+        # A mod can also dispatch more than one command.
+        # The following is an example of a function that gets called when another
+        # command is executed.
+        def goodbye(bot, update, args):
+                bot.sendMessage(chat_id=update.message.chat_id, text="Goodbye {}!".format(''.join(args)))
+
+        # The following functions handle regular messages. These examples define
+        # commands that are executed without slashes at the beginning.
+        def stupid(bot, update, args):
+                msg = update.message.text.lower()
+
+                if msg == "stupid bot" or msg == "stupid bot!" or msg == "stupid bot.":
+                        bot.sendMessage(chat_id=update.message.chat_id, text="Stupid human.")
+
+        def noslash(bot, update, args):
+                # get the message
+                msg = update.message.text.lower()
+                
+                if msg == "hello":
+                        hello(bot, update)
+                elif msg.startswith("goodbye"):
+                        goodbye(bot, update, args)
+
+        ## Dispatching! ##
+
+        # Check and set the config with default keys.
+        # This will be under your mod's section (identified by your mod's filename
+        # (without the extention), in this case 'test')
+        if not mod.get_config():
                 default_keys = {
                         "enabled": "yes",
                         "message": "Hello!"
                 }
 
-                helloMod.set_config(default_keys)
+                mod.set_config(default_keys)
 
-        # check if the module is enabled
-        if helloMod.get_config("enabled") == "yes":
-                # Get dispatcher
-                dp = updater.dispatcher
-                
-                # This listens for the command "/test" and calls the test() function if
-                # the command is executed
-                dp.addTelegramCommandHandler("goodbye", goodbye)
-                dp.addTelegramCommandHandler("stupid bot", stupid)
-                
-                # A command that will execute will no slash
-                dp.addTelegramMessageHandler(stupid)
-                dp.addTelegramMessageHandler(noslash)
+        # Get dispatcher
+        dp = updater.dispatcher
+               
+        # This listens for the command "/goodbye" and calls the goodbye() function if the
+        # command is executed
+        dp.addTelegramCommandHandler("goodbye", goodbye)
 
-                # You can also handle the same functionaltiy for multiple commands:
-                dp.addTelegramCommandHandler("hello", hello)
-                dp.addTelegramCommandHandler("morning", hello)
-                dp.addTelegramCommandHandler("hi", hello)
+        # You can also handle the same functionaltiy for multiple commands:
+        dp.addTelegramCommandHandler("hello", hello)
+        dp.addTelegramCommandHandler("morning", hello)
+        dp.addTelegramCommandHandler("hi", hello)
+
+        # A command that will execute will no slash
+        dp.addTelegramMessageHandler(stupid)
+        dp.addTelegramMessageHandler(noslash)

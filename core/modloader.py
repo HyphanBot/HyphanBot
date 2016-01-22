@@ -4,7 +4,6 @@ import sys
 import os
 
 # Gets and loads mods from the modules directory.
-
 def getMods(logger):
         modDir     = "../modules"
         mainModule = "main"
@@ -13,10 +12,9 @@ def getMods(logger):
         possibleMods = os.listdir(modDir) # List the contents of the mod directory
 
         for mod in possibleMods: # iterate through the list
-                if mod == "__pycache__":
+                if mod == "__pycache__" or mod[-1] == "~": # if there is shit, ignore it.
                         continue
-                elif mod[-1] == "~":
-                        continue
+
                 mainModule = "main" # Reset the variable to "main" for every loop
                 modName = mod
                 location = os.path.join(modDir, mod)
@@ -38,6 +36,7 @@ def loadMod(mod):
         # load the mod. This basically imports it.
         return SourceFileLoader(mod["name"], mod["path"]).load_module()
 
+''' Again, useless shit.
 def reloadMod(modName):
         #try:
                 #modName = mod['name']
@@ -46,3 +45,4 @@ def reloadMod(modName):
         #except Exception:
         #        print("Shit...")
         #        return SourceFileLoader(mod["name"], mod["path"]).load_module()o
+'''
