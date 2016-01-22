@@ -72,9 +72,9 @@ class HyphanAPI:
                         name    (string): The name of the mod.
                 """
                 def __init__(self, api, name):
-                        self.api  = api
-                        self.name = name
-                        self.logger  = logging.getLogger(__name__)
+                        self.api    = api
+                        self.name   = name
+                        self.logger = logging.getLogger(__name__)
 
                 def section_exists(self):
                         if self.name in self.api.config.get_sections():
