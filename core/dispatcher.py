@@ -1,3 +1,4 @@
+from constants import HYPHAN_DIR
 from modloader import *
 
 import logging
@@ -15,7 +16,9 @@ def loadModules(api, updater):
 			mod = loadMod(i) # Load the mod
 			if "dispatch" in dir(mod): # Check if the dispatch function exists in the mod
 				modapi = api.Mod(api, mod.__name__)
+				os.chdir(i['location'])
 				mod.dispatch(modapi, updater)
+				os.chdir(HYPHAN_DIR+"/core")
 			else:
 				logger.warn("Cannot dispatch mod '%s': dispatch() is missing." % mod.__name__)
 

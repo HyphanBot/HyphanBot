@@ -28,7 +28,7 @@ def getMods(logger):
                 elif not mainModule+".py" in os.listdir(location): # If main.py is not found in the mod directory...
                         logger.warn("Not loading mod '%s': Entry point '%s.py' not found." % (mod, mainModule))
                         continue
-                mods.append({ "name": modName, "path": location+"/"+mainModule+".py", "main": mainModule })
+                mods.append({ "name": modName, "location": location, "path": location+"/"+mainModule+".py", "main": mainModule })
                 logger.info("Found mod '%s'." % modName)
         return mods
 

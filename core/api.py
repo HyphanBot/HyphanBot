@@ -35,7 +35,7 @@ class HyphanAPI:
         Args:
                 updater (telegram.Updater): The updater object that could be 
                         used in mods.
-                config  (Configurator): The configuration object that is
+                config  (Configurator)    : The configuration object that is
                         used to parse and access the configuration file.
         """
         def __init__(self, updater, config):
@@ -68,8 +68,8 @@ class HyphanAPI:
                 This class identifies the actual mod.
 
                 Args:
-                        api  (HyphanAPI): The base api the mod will use.
-                        name    (string): The name of the mod.
+                        api  (HyphanAPI): The base api object the mod will use.
+                        name (string)   : The name of the mod.
                 """
                 def __init__(self, api, name):
                         self.api    = api
@@ -85,7 +85,10 @@ class HyphanAPI:
                 def get_config(self, key=None, fallback=None):
                         if self.name not in self.api.config.get_sections():
                                 self.logger.warn("Missing config section for mod '%s'" % self.name)
-                                return False
+                                if not key == None:
+                                        return self.api.config.access(self.name, key, fallback)
+                                else:
+                                        return False
                         else:
                                 if not key == None:
                                         return self.api.config.access(self.name, key, fallback)

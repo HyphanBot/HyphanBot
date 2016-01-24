@@ -6,9 +6,10 @@ from api import *
 import logging
 import notify2
 import os
+import sys
 
-# Get Hyphan's root directory from the environment variable (exported in run.sh)
-HYPHAN_DIR = os.getenv('HYPHAN_DIR', "/hyphan")
+## Get Hyphan's root directory from the environment variable (exported in run.sh)
+#HYPHAN_DIR = os.getenv('HYPHAN_DIR', os.path.dirname(os.getcwd()))
 
 # Log everything
 # filter for the stupid shit python-telegram-bot reports

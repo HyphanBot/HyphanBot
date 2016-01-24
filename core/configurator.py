@@ -1,7 +1,7 @@
 from configparser import SafeConfigParser
 from os import mkdir
 from os.path import expanduser
-from main import HYPHAN_DIR
+from constants import HYPHAN_DIR
 
 import pathlib
 import sys
