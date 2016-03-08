@@ -9,17 +9,15 @@ confuse them with Python modules, since Hyphan is written in Python.
 The following code and comments describes the basic structure of how
 command mods work.
 '''
-global helloMod
-
 # Dispatch function. This is the core of every mod.
 # This is what Hyphan calls to initialize the mod.
-def dispatch(mod, updater):
+def dispatch(api, updater):
 
         # Function that defines your mod. This will be called when the command
         # is executed.
         # In this example, the message will be provided from the configuration file.
         def hello(bot, update):
-                bot.sendMessage(chat_id=update.message.chat_id, text="{}".format(mod.get_config("message")))
+                bot.sendMessage(chat_id=update.message.chat_id, text="{}".format(api.get_config("message")))
 
         # A mod can also dispatch more than one command.
         # The following is an example of a function that gets called when another
@@ -52,13 +50,13 @@ def dispatch(mod, updater):
         # Check and set the config with default keys.
         # This will be under your mod's section (identified by your mod's filename
         # (without the extention), in this case 'test')
-        if not mod.get_config():
+        if not api.get_config():
                 default_keys = {
                         "enabled": "yes",
                         "message": "Hello!"
                 }
 
-                mod.set_config(default_keys)
+                api.set_config(default_keys)
 
         # Get dispatcher
         dp = updater.dispatcher
@@ -77,5 +75,5 @@ def dispatch(mod, updater):
         dp.addTelegramMessageHandler(noslash)
 
         # Adds help text to the commands
-        mod.set_help('goodbye', "Says goodbye to you when you ask for it.")
-        mod.set_help('hello', 'Hello world!')
+        api.set_help('goodbye', "Says goodbye to you when you ask for it.")
+        api.set_help('hello', 'Hello world!')

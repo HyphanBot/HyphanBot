@@ -2,37 +2,38 @@
 This mod operates the bot. It can quit or restart Hyphan.
 '''
 
-import os, signal
+import os, signal, sys
 
-global operMod
+global api
 
 def quit(bot, update):
-        if operMod.api.is_sender_admin(update): # Use the API to check if sender is admin
-                bot.sendMessage(chat_id=update.message.chat_id, 
-                        text="Goodbye!")
+        if api.api.is_sender_admin(update): # Use the API to check if sender is admin
+                bot.sendMessage(chat_id=update.message.chat_id,
+                                text="Goodbye!")
                 os.kill(os.getpid(), signal.SIGTERM)
         else:
-                bot.sendMessage(chat_id=update.message.chat_id, 
-                        text="Sorry, %s, I'm afraid I can't let you do that." % update.message.from_user.first_name)
+                bot.sendMessage(chat_id=update.message.chat_id,
+                                text="Sorry, %s, I'm afraid I can't let you do that." % update.message.from_user.first_name)
 
 def restart(bot, update):
         # This will only restart the bot if it was running from the launcher script (currently run.sh)
-        if operMod.api.is_sender_admin(update): # Use the API to check if sender is admin
-                bot.sendMessage(chat_id=update.message.chat_id, 
-                        text="See ya!")
+        if api.api.is_sender_admin(update): # Use the API to check if sender is admin
+                bot.sendMessage(chat_id=update.message.chat_id,
+                                text="See ya!")
+                print(__file__)
                 os.kill(os.getpid(), signal.SIGKILL)
         else:
-                bot.sendMessage(chat_id=update.message.chat_id, 
-                        text="Sorry, %s, I'm afraid I can't let you do that." % update.message.from_user.first_name)
+                bot.sendMessage(chat_id=update.message.chat_id,
+                                text="Sorry, %s, I'm afraid I can't let you do that." % update.message.from_user.first_name)
 
 def reload_config(bot, update):
-        if operMod.api.is_sender_admin(update):
-                operMod.api.config.refresh_config()
-                bot.sendMessage(chat_id=update.message.chat_id, 
-                        text="Configuration file reloaded.")
+        if api.api.is_sender_admin(update):
+                api.api.config.refresh_config()
+                bot.sendMessage(chat_id=update.message.chat_id,
+                                text="Configuration file reloaded.")
         else:
-                bot.sendMessage(chat_id=update.message.chat_id, 
-                        text="Sorry, %s, I'm afraid I can't let you do that." % update.message.from_user.first_name)
+                bot.sendMessage(chat_id=update.message.chat_id,
+                                text="Sorry, %s, I'm afraid I can't let you do that." % update.message.from_user.first_name)
 
 def noslash(bot, update):
         msg = update.message.text
@@ -44,9 +45,9 @@ def noslash(bot, update):
                 reload_config(bot, update)
 
 def dispatch(mod, updater):
-        global operMod
+        global api
 
-        operMod = mod
+        api= mod
         dp = updater.dispatcher
 
         dp.addTelegramCommandHandler("quit", quit)
