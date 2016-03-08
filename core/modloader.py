@@ -12,7 +12,7 @@ def getMods(logger):
         possibleMods = os.listdir(modDir) # List the contents of the mod directory
 
         for mod in possibleMods: # iterate through the list
-                if mod == "__pycache__" or mod[-1] == "~": # if there is shit, ignore it.
+                if mod == "__pycache__" or mod[-1] == "~": # ignore backup files and the like
                         continue
 
                 mainModule = "main" # Reset the variable to "main" for every loop
@@ -35,14 +35,3 @@ def getMods(logger):
 def loadMod(mod):
         # load the mod. This basically imports it.
         return SourceFileLoader(mod["name"], mod["path"]).load_module()
-
-''' Again, useless shit.
-def reloadMod(modName):
-        #try:
-                #modName = mod['name']
-                print(sys.modules[modName])
-                return importlib.reload(sys.modules[modName])
-        #except Exception:
-        #        print("Shit...")
-        #        return SourceFileLoader(mod["name"], mod["path"]).load_module()o
-'''

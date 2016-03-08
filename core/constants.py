@@ -1,5 +1,4 @@
 # This file exists because fuck Python.
-
 import os
 
 # Get Hyphan's root directory from the environment variable (exported in run.sh)

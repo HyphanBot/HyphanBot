@@ -35,7 +35,7 @@ mainlog.addFilter(Filter())
 
 def error(bot, update, error):
         logger.warn('Error occured in update, "%s": %s' % (update, error))
-        notify2.Notification("Error occured in update '%s': '%s'" % (update, error)) 
+        notify2.Notification("Error occured in update '%s': '%s'" % (update, error))
 
 def start_bot():
         # Initialize config
@@ -52,13 +52,13 @@ def start_bot():
         loadModules(api, updater)
         dp.addErrorHandler(error)
 
-        # Start the 
+        # Start the
         updater.start_polling()
 
         # Notify that the bot started
         notify2.init(getBot.username)
         notify2.Notification("Initialized {}".format(getBot.first_name),
-            "{} has started".format(getBot.username), "notification-message-im").show()
+                             "{} has started".format(getBot.username), "notification-message-im").show()
         logger.info("Initialized %s (%s)." % (getBot.first_name, getBot.username))
 
         updater.idle()

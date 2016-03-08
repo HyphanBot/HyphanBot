@@ -10,7 +10,7 @@ The following code and comments describes the basic structure of how
 command mods work.
 '''
 global helloMod
-        
+
 # Dispatch function. This is the core of every mod.
 # This is what Hyphan calls to initialize the mod.
 def dispatch(mod, updater):
@@ -25,7 +25,10 @@ def dispatch(mod, updater):
         # The following is an example of a function that gets called when another
         # command is executed.
         def goodbye(bot, update, args):
-                bot.sendMessage(chat_id=update.message.chat_id, text="Goodbye {}!".format(''.join(args)))
+                if len(args) != 0:
+                        bot.sendMessage(chat_id=update.message.chat_id, text="Goodbye {}!".format(''.join(args)))
+                else:
+                        bot.sendMessage(chat_id=update.message.chat_id, text="Goodbye!")
 
         # The following functions handle regular messages. These examples define
         # commands that are executed without slashes at the beginning.
@@ -38,7 +41,7 @@ def dispatch(mod, updater):
         def noslash(bot, update, args):
                 # get the message
                 msg = update.message.text.lower()
-                
+
                 if msg == "hello":
                         hello(bot, update)
                 elif msg.startswith("goodbye"):
@@ -59,7 +62,7 @@ def dispatch(mod, updater):
 
         # Get dispatcher
         dp = updater.dispatcher
-               
+
         # This listens for the command "/goodbye" and calls the goodbye() function if the
         # command is executed
         dp.addTelegramCommandHandler("goodbye", goodbye)
@@ -72,3 +75,7 @@ def dispatch(mod, updater):
         # A command that will execute will no slash
         dp.addTelegramMessageHandler(stupid)
         dp.addTelegramMessageHandler(noslash)
+
+        # Adds help text to the commands
+        mod.set_help('goodbye', "Says goodbye to you when you ask for it.")
+        mod.set_help('hello', 'Hello world!')
