@@ -15,9 +15,8 @@ License along with Hyphan.  If not, see
 https://www.gnu.org/licenses/agpl-3.0.html>.
 '''
 # ...
-
 import logging
 
 def dispatch(mod, updater):
-        logger.info("Module loading initialized.")
         logger = logging.getLogger(__name__)
+        logger.info("Module loading initialized.")

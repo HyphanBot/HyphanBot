@@ -14,20 +14,30 @@ You should have received a copy of the GNU Afferno General Public
 License along with Hyphan.  If not, see
 https://www.gnu.org/licenses/agpl-3.0.html>.
 '''
-
 from telegram import ParseMode
 
+def devChannel(bot, update, args):
+    if api.api.is_sender_admin(update):
+        channel = api.get_config("channel")
+        bot.sendMessage(chat_id=channel, text=" ".join(args), parse_mode=ParseMode.MARKDOWN)
+    else:
+        bot.sendMessage(chat_id=update.message.chat_id, text="*You're not admin.*",
+                        parse_mode=ParseMode.MARKDOWN)
+
 # Development commands
-def dispatch(api, updater):
+class dispatch(object):
+    def __init__(self, api, updater):
+        self.define_commands(updater)
+        self.define_help(api)
+        self.set_api(api)
+
+    def set_api(self, temp):
+        global api
+        api = temp
+
+    def define_commands(self, updater):
         dp = updater.dispatcher
-
-        def devChannel(bot, update, args):
-                if api.api.is_sender_admin(update):
-                        msg = " ".join(args)
-                        channel = api.get_config("channel")
-                        bot.sendMessage(chat_id=channel, text=msg, parse_mode=ParseMode.MARKDOWN)
-                else:
-                        bot.sendMessage(chat_id=update.message.chat_id, text="*You're not admin.*", parse_mode=ParseMode.MARKDOWN)
-
         dp.addTelegramCommandHandler("devpost", devChannel)
+
+    def define_help(self, api):
         api.set_help('devpost', 'Send a message to the development channel.\n/devpost [message]')

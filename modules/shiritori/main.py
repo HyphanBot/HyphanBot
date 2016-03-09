@@ -26,22 +26,15 @@ import requests
 import logging
 
 '''
-Hyphan experimant: Shiritori/Word_Chain game module
+Hyphan experiment: Shiritori/Word_Chain game module
 
 TODO: Implement score system based on https://shiritorigame.com
         - Optional: Subtract the remaining time from the score in each turn (Speed bonus)
+        - Optional: Init from dispatch but the maincode outside?
+        - Optional: Create an /opt/ dir for modules like this.
 '''
 global logger
 global helptext
-
-helptext = """
-*Shiritori*, also known as *Word Chain*, is a game in which the players say a word that begins with the last letter of the previous word.
-_Shiritori_ originated in Japan. The word "Shiritori" literally means "taking the end" according to [Wikipedia](https://en.wikipedia.org/wiki/Shiritori) (See also: [Word Chain](https://en.wikipedia.org/wiki/Word_chain)).
-
-I can only play this game in English. I'm currently hard to beat and I might use really long words, but I was just taught to not be fair... Sorry.
-To start a match with me, type:
-        `/shiritori start` or `/wordchain start`
-"""
 
 logger = logging.getLogger(__name__)
 
@@ -254,3 +247,5 @@ You win!!!
         dp.addTelegramCommandHandler("shiritori", start_game)
         dp.addTelegramCommandHandler("wordchain", start_game)
         dp.addTelegramMessageHandler(shiritori)
+
+        ai.set_help("shiritori", "*Shiritori*, also known as *Word Chain*, is a game in which the players say a word that begins with the last letter of the previous word.\n _Shiritori_ originated in Japan. The word "Shiritori" literally means "taking the end" according to [Wikipedia](https://en.wikipedia.org/wiki/Shiritori) (See also: [Word Chain](https://en.wikipedia.org/wiki/Word_chain)).\n I can only play this game in English. I'm currently hard to beat and I might use really long words, but I was just taught to not be fair... Sorry. To start a match with me, type: `/shiritori start` or `/wordchain start`")
