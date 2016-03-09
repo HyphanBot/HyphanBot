@@ -1,3 +1,20 @@
+'''
+This file is part of Hyphan.
+Hyphan is free software: you can redistribute it and/or modify
+it under the terms of the GNU Afferno General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Hyphan is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Afferno General Public License for more details.
+
+You should have received a copy of the GNU Afferno General Public
+License along with Hyphan.  If not, see
+https://www.gnu.org/licenses/agpl-3.0.html>.
+'''
+
 from configparser import SafeConfigParser
 from os import mkdir
 from os.path import expanduser
@@ -29,8 +46,8 @@ class Configurator:
         self.config = self.__init_config()
 
     def __init_config(self):
-            logger = self.logger
-            config = SafeConfigParser()
+        logger = self.logger
+        config = SafeConfigParser()
 
             # Look in the CONFIG_PATHS for the config file
             for cfile in CONFIG_PATHS:
@@ -49,25 +66,25 @@ class Configurator:
             if not (answer.lower() == "n" or answer.lower() == "no"):
                 answer = input("Do you want to enter the info interactively? [Y/n] ")
                 if not (answer.lower() == "n" or answer.lower() == "no"):
-                        mkdir(HOME + '/.config/hyphan')
-                        writefile = open(XDG_CONFIG, "w")
-                        token     = input("Telegram bot token: ")
-                        admins    = input("Bot administrators (Telegram usernames seperated by space): ")
-                        writefile.write(str(
-"""[general]
+                    mkdir(HOME + '/.config/hyphan')
+                    writefile = open(XDG_CONFIG, "w")
+                    token     = input("Telegram bot token: ")
+                    admins    = input("Bot administrators (Telegram usernames seperated by space): ")
+                    writefile.write(str(
+                        """[general]
 token   = %s
 admins  = %s""" % (token, admins)))
-                        writefile.close()
+                    writefile.close()
                 else:
-                        mkdir(HOME + '/.config/hyphan')
-                        writefile = open(XDG_CONFIG, "w")
-                        writefile.write(str(
-"""[general]
+                    mkdir(HOME + '/.config/hyphan')
+                    writefile = open(XDG_CONFIG, "w")
+                    writefile.write(str(
+                        """[general]
 token   = TOKEN
 admins  = admin1 admin2"""))
-                        writefile.close()
-                        print("Don't forget to edit the file before you start the program again!")
-            sys.exit(2) # No such file or directory.
+                    writefile.close()
+                    print("Don't forget to edit the file before you start the program again!")
+                    sys.exit(2) # No such file or directory.
 
     def refresh_config(self):
         self.config = None

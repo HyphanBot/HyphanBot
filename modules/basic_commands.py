@@ -1,4 +1,19 @@
 '''
+This file is part of Hyphan.
+Hyphan is free software: you can redistribute it and/or modify
+it under the terms of the GNU Afferno General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Hyphan is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Afferno General Public License for more details.
+
+You should have received a copy of the GNU Afferno General Public
+License along with Hyphan.  If not, see
+https://www.gnu.org/licenses/agpl-3.0.html>.
+-----
 This mod provides the basic commands that display possible information about the bot.
 '''
 
@@ -15,7 +30,7 @@ def dispatch(api, updater):
         def anti_nick(bot, update):
                 msg = update.message.text.lower()
 
-                if msg == "..":
+                if msg[len(msg) - 2:] == ".." and msg[len(msg) - 3:] != "...":
                         bot.sendMessage(chat_id=update.message.chat_id, text="Three dots, Nick.")
 
         def noslash(bot, update):

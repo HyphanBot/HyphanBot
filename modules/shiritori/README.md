@@ -51,5 +51,4 @@ wlsavename = shiritori_wordlist.txt
 ```
 
 Licence
--------
-Same as HyphanBot
+Same as HyphanBot-------
