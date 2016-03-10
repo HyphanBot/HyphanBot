@@ -15,7 +15,6 @@ License along with Hyphan.  If not, see
 https://www.gnu.org/licenses/agpl-3.0.html>.
 '''
 
-from nltk.corpus import words
 from telegram import ParseMode
 from tqdm import tqdm # Progress bar module. Install: pip install tqdm
 from os import path
@@ -30,8 +29,8 @@ Hyphan experiment: Shiritori/Word_Chain game module
 
 TODO: Implement score system based on https://shiritorigame.com
         - Optional: Subtract the remaining time from the score in each turn (Speed bonus)
-        - Optional: Init from dispatch but the maincode outside?
-        - Optional: Create an /opt/ dir for modules like this.
+    - Optional: Init from dispatch but the maincode outside?
+    - Optional: Create an /opt/ dir for modules like this.
 '''
 global logger
 global helptext
@@ -48,11 +47,11 @@ def get_wordlist(url, filename="shiritori_wordlist.txt"):
                         for chunk in content_progress:
                                 content_progress.set_description("Downloading wordlist")
                                 filehandle.write(chunk) # Download them words
-                                logger.info("New wordlist saved to 'shiritori/%s'" % filename)
+                logger.info("New wordlist saved to 'shiritori/%s'" % filename)
         with open(filename, 'r') as filehandle:
                 wordlist = [word.strip().lower() for word in filehandle] # Make them words go naked and bend over
-                wordlist = list(filter(lambda x: "'s" not in x, wordlist)) # Filter out all them damned 's
-                wordlist = list(filter(lambda x: len(x) < 30, wordlist)) # Filter them ugly fat words longer than 30 characters, if any
+        wordlist = list(filter(lambda x: "'s" not in x, wordlist)) # Filter out all them damned 's
+        wordlist = list(filter(lambda x: len(x) < 30, wordlist)) # Filter them ugly fat words longer than 30 characters, if any
         return wordlist # Bring 'em to me!!
 
 def dispatch(mod, updater):
@@ -89,7 +88,7 @@ def dispatch(mod, updater):
         losemsg = mod.get_config("losemessage", "This was so predictable, hehe.")
 
         # Gets and downloads the wordlist if not already downloaded
-        wordlist = get_wordlist(mod.get_config("wlurl", "http://nerdyserv.no-ip.org/hyphan/SCOWL-wl/words.txt"),
+        wordlist = get_wordlist(mod.get_config("wlurl", "https://techisized.com/hyphanbot/SCOWL-wl/words.txt"),
                                 mod.get_config("wlsavename", "shiritori_wordlist.txt"))
 
         started    = False
@@ -248,4 +247,11 @@ You win!!!
         dp.addTelegramCommandHandler("wordchain", start_game)
         dp.addTelegramMessageHandler(shiritori)
 
-        ai.set_help("shiritori", "*Shiritori*, also known as *Word Chain*, is a game in which the players say a word that begins with the last letter of the previous word.\n _Shiritori_ originated in Japan. The word "Shiritori" literally means "taking the end" according to [Wikipedia](https://en.wikipedia.org/wiki/Shiritori) (See also: [Word Chain](https://en.wikipedia.org/wiki/Word_chain)).\n I can only play this game in English. I'm currently hard to beat and I might use really long words, but I was just taught to not be fair... Sorry. To start a match with me, type: `/shiritori start` or `/wordchain start`")
+        mod.set_help("shiritori", """
+*Shiritori*, also known as *Word Chain*, is a game in which the players say a word that begins with the last letter of the previous word.
+_Shiritori_ originated in Japan. The word "Shiritori" literally means "taking the end" according to [Wikipedia](https://en.wikipedia.org/wiki/Shiritori) (See also: [Word Chain](https://en.wikipedia.org/wiki/Word_chain)).
+
+I can only play this game in English. I'm currently hard to beat and I might use really long words, but I was just taught to not be fair... Sorry.
+To start a match with me, type:
+    `/shiritori start` or `/wordchain start`
+""")

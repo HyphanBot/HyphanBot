@@ -84,7 +84,7 @@ class Configurator:
                     admins  = admin1 admin2"""))
                 writefile.close()
                 print("Don't forget to edit the file before you start the program again!")
-                sys.exit(2) # No such file or directory.
+            sys.exit(2) # No such file or directory.
 
     def refresh_config(self):
         self.config = None

@@ -21,7 +21,6 @@ from dispatcher import *
 from api import *
 
 import logging
-import notify2
 import os
 import sys
 
@@ -50,9 +49,17 @@ telegramlog = logging.getLogger("telegram.bot")
 telegramlog.addFilter(Filter())
 mainlog.addFilter(Filter())
 
+try:
+    import notify2
+except:
+    logger.info("Unable to import 'notify2' module")
+
 def error(bot, update, error):
         logger.warn('Error occured in update, "%s": %s' % (update, error))
-        notify2.Notification("Error occured in update '%s': '%s'" % (update, error))
+        try:
+            notify2.Notification("Error occured in update '%s': '%s'" % (update, error))
+        except:
+            pass
 
 def start_bot():
         # Initialize config
@@ -73,9 +80,12 @@ def start_bot():
         updater.start_polling()
 
         # Notify that the bot started
-        notify2.init(getBot.username)
-        notify2.Notification("Initialized {}".format(getBot.first_name),
-                             "{} has started".format(getBot.username), "notification-message-im").show()
+        try:
+            notify2.init(getBot.username)
+            notify2.Notification("Initialized {}".format(getBot.first_name),
+                                 "{} has started".format(getBot.username), "notification-message-im").show()
+        except:
+            logger.info("Not initializing 'notify2' module")
         logger.info("Initialized %s (%s)." % (getBot.first_name, getBot.username))
 
         updater.idle()

@@ -17,8 +17,10 @@ https://www.gnu.org/licenses/agpl-3.0.html>.
 This mod provides the basic commands that display possible information about the bot.
 '''
 
+from telegram import ParseMode
+
 def help_cmd(bot, update, args):
-    bot.sendMessage(chat_id=update.message.chat_id, text=api.get_help(args))
+    bot.sendMessage(chat_id=update.message.chat_id, text=api.get_help(args), parse_mode=ParseMode.MARKDOWN)
 
 def about(bot, update):
     # TODO: Get text and other settings from config
