@@ -41,6 +41,11 @@ def loadModules(api, updater):
                 os.chdir(i['location'])
                 mod.dispatch(modapi, updater)
                 os.chdir(HYPHAN_DIR+"/core")
+            elif "Dispatch" in dir(mod):
+                modapi = api.Mod(api, mod.__name__)
+                os.chdir(i['location'])
+                mod.Dispatch(modapi, updater)
+                os.chdir(HYPHAN_DIR + "/core")
             else:
                 logger.warn("Cannot dispatch mod '%s': dispatch() is missing." % mod.__name__)
 

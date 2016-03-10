@@ -31,75 +31,75 @@ for Hyphan's mods.
 """
 
 class HyphanAPI:
+    """
+    This class provides API for making Hyphan mods communicate better
+    with the internal core of Hyphan and the Telegram bot module.
+
+    Args:
+            updater (telegram.Updater): The updater object that could be
+                    used in mods.
+            config  (Configurator)    : The configuration object that is
+                    used to parse and access the configuration file.
+    """
+    def __init__(self, updater, config):
+        self.updater = updater
+        self.main    = main
+        self.config  = config
+        self.logger  = logging.getLogger(__name__)
+
+    def get_admins(self):
+        return self.config.parse_general()['adminlist']
+
+    def is_admin(self, username):
+        return username in self.get_admins()
+
+    def is_sender_admin(self, update):
+        return self.is_admin(update.message.from_user.username)
+
+    def get_updater(self):
+        return self.updater
+
+    class Mod:
         """
-        This class provides API for making Hyphan mods communicate better
-        with the internal core of Hyphan and the Telegram bot module.
+        This class identifies the actual mod.
 
         Args:
-                updater (telegram.Updater): The updater object that could be
-                        used in mods.
-                config  (Configurator)    : The configuration object that is
-                        used to parse and access the configuration file.
+                api  (HyphanAPI): The base api object the mod will use.
+                name (string)   : The name of the mod.
         """
-        def __init__(self, updater, config):
-                self.updater = updater
-                self.main    = main
-                self.config  = config
-                self.logger  = logging.getLogger(__name__)
+        def __init__(self, api, name):
+            self.api    = api
+            self.name   = name
+            self.logger = logging.getLogger(__name__)
 
-        def get_admins(self):
-                return self.config.parse_general()['adminlist']
+        def section_exists(self):
+            if self.name in self.api.config.get_sections():
+                return True
+            else:
+                return False
 
-        def is_admin(self, username):
-                return username in self.get_admins()
+        def get_config(self, key=None, fallback=None):
+            if self.name not in self.api.config.get_sections():
+                self.logger.warn("Missing config section for mod '%s'" % self.name)
+                if key != None:
+                    return self.api.config.access(self.name, key, fallback)
+                else:
+                    return False
+            else:
+                if key != None:
+                    return self.api.config.access(self.name, key, fallback)
+                else:
+                    return True
 
-        def is_sender_admin(self, update):
-                return self.is_admin(update.message.from_user.username)
+        def set_config(self, data):
+            return self.api.config.append(self.name, data)
 
-        def get_updater(self):
-                return self.updater
+        def set_help(self, module, text):
+            helptext[str(module)] = text
 
-        class Mod:
-                """
-                This class identifies the actual mod.
-
-                Args:
-                        api  (HyphanAPI): The base api object the mod will use.
-                        name (string)   : The name of the mod.
-                """
-                def __init__(self, api, name):
-                        self.api    = api
-                        self.name   = name
-                        self.logger = logging.getLogger(__name__)
-
-                def section_exists(self):
-                        if self.name in self.api.config.get_sections():
-                                return True
-                        else:
-                                return False
-
-                def get_config(self, key=None, fallback=None):
-                        if self.name not in self.api.config.get_sections():
-                                self.logger.warn("Missing config section for mod '%s'" % self.name)
-                                if key != None:
-                                        return self.api.config.access(self.name, key, fallback)
-                                else:
-                                        return False
-                        else:
-                                if key != None:
-                                        return self.api.config.access(self.name, key, fallback)
-                                else:
-                                        return True
-
-                def set_config(self, data):
-                        return self.api.config.append(self.name, data)
-
-                def set_help(self, module, text):
-                        helptext[str(module)] = text
-
-                def get_help(self, module):
-                        module = ''.join(module)
-                        if module in helptext:
-                                return helptext[module]
-                        else:
-                                return "Help isn't not coming..."
+        def get_help(self, module):
+            module = ''.join(module)
+            if module in helptext:
+                return helptext[module]
+            else:
+                return "Help isn't coming..."

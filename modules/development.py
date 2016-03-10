@@ -25,7 +25,7 @@ def devChannel(bot, update, args):
                         parse_mode=ParseMode.MARKDOWN)
 
 # Development commands
-class dispatch(object):
+class Dispatch(object):
     def __init__(self, api, updater):
         self.define_commands(updater)
         self.define_help(api)

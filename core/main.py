@@ -30,18 +30,18 @@ import sys
 # Log everything
 # filter for the stupid shit python-telegram-bot reports
 class Filter(logging.Filter):
-        def filter(self, record):
-                message = record.getMessage()
-                if message == "No new updates found.":
-                        return False
-                elif message.endswith("webhook"):
-                        return False
-                else:
-                        return True
+    def filter(self, record):
+        message = record.getMessage()
+        if message == "No new updates found.":
+            return False
+        elif message.endswith("webhook"):
+            return False
+        else:
+            return True
 
 logging.basicConfig(
-        format='%(asctime)s - %(name)s [%(levelname)s]: %(message)s',
-        level=logging.INFO) # change this to logging.INFO to enable verbose mode
+    format='%(asctime)s - %(name)s [%(levelname)s]: %(message)s',
+    level=logging.INFO) # change this to logging.INFO to enable verbose mode
 
 logger      = logging.getLogger(__name__)
 mainlog     = logging.getLogger("__main__")
@@ -51,44 +51,44 @@ mainlog.addFilter(Filter())
 
 try:
     import notify2
+    notify = true
 except:
     logger.info("Unable to import 'notify2' module")
 
 def error(bot, update, error):
-        logger.warn('Error occured in update, "%s": %s' % (update, error))
-        try:
-            notify2.Notification("Error occured in update '%s': '%s'" % (update, error))
-        except:
-            pass
+    logger.warn('Error occured in update, "%s": %s' % (update, error))
+    if notify:
+        notify2.Notification("Error occured in update '%s': '%s'" % (update, error))
 
 def start_bot():
-        # Initialize config
-        config = Configurator()
-        generalconfig = config.parse_general()
+    # Initialize config
+    config = Configurator()
+    generalconfig = config.parse_general()
 
-        updater = Updater(generalconfig['token'], workers=10)
-        getBot  = updater.bot.getMe()
+    updater = Updater(generalconfig['token'], workers=10)
+    getBot  = updater.bot.getMe()
 
-        api = HyphanAPI(updater, config)
+    api = HyphanAPI(updater, config)
 
-        # Dispatch modules
-        dp = updater.dispatcher
-        loadModules(api, updater)
-        dp.addErrorHandler(error)
+    # Dispatch modules
+    dp = updater.dispatcher
+    loadModules(api, updater)
+    dp.addErrorHandler(error)
 
-        # Start the
-        updater.start_polling()
+    # Start the bot
+    updater.start_polling()
 
-        # Notify that the bot started
-        try:
-            notify2.init(getBot.username)
-            notify2.Notification("Initialized {}".format(getBot.first_name),
-                                 "{} has started".format(getBot.username), "notification-message-im").show()
-        except:
-            logger.info("Not initializing 'notify2' module")
+    # Notify that the bot started
+    if notify:
+        notify2.init(getBot.username)
+        notify2.Notification("Initialized {}".format(getBot.first_name),
+                             "{} has started".format(getBot.username),
+                             "notification-message-im").show()
+    else:
+        logger.info("Not initializing 'notify2' module")
         logger.info("Initialized %s (%s)." % (getBot.first_name, getBot.username))
 
-        updater.idle()
+    updater.idle()
 
 if __name__ == '__main__':
-        start_bot()
+    start_bot()
