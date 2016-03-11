@@ -13,6 +13,8 @@ GNU Afferno General Public License for more details.
 You should have received a copy of the GNU Afferno General Public
 License along with Hyphan.  If not, see
 https://www.gnu.org/licenses/agpl-3.0.html>.
+-----
+This module is used to manage the configuration file for Hyphan.
 '''
 
 from configparser import SafeConfigParser
@@ -24,13 +26,9 @@ import pathlib
 import sys
 import logging
 
-'''
-This module is used to manage the configuration file for Hyphan.
-'''
-
 HOME         = expanduser("~")
 CONFIG_PATHS = [
-    # Checks if there is the config file in Hyphan's root directory (by default there shouldn't be).
+    # Checks if there is the config file in Hyphan's root directory.
     HYPHAN_DIR + "/config.ini",
 
     # Checks in the user's home directory.
@@ -84,7 +82,7 @@ class Configurator:
                     admins  = admin1 admin2"""))
                 writefile.close()
                 print("Don't forget to edit the file before you start the program again!")
-            sys.exit(2) # No such file or directory.
+                sys.exit(2) # No such file or directory.
 
     def refresh_config(self):
         self.config = None

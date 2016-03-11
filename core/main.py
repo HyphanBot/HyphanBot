@@ -15,10 +15,12 @@ License along with Hyphan.  If not, see
 https://www.gnu.org/licenses/agpl-3.0.html>.
 '''
 
-from telegram import Update, Bot, Updater
-from configurator import *
-from dispatcher import *
-from api import *
+import telegram
+
+# project specific
+import configurator
+import dispatcher
+import api
 
 import logging
 import os
@@ -49,12 +51,6 @@ telegramlog = logging.getLogger("telegram.bot")
 telegramlog.addFilter(Filter())
 mainlog.addFilter(Filter())
 
-try:
-    import notify2
-    notify = true
-except:
-    logger.info("Unable to import 'notify2' module")
-
 def error(bot, update, error):
     logger.warn('Error occured in update, "%s": %s' % (update, error))
     if notify:
@@ -62,30 +58,35 @@ def error(bot, update, error):
 
 def start_bot():
     # Initialize config
-    config = Configurator()
+    config = configurator.Configurator()
     generalconfig = config.parse_general()
 
-    updater = Updater(generalconfig['token'], workers=10)
+    updater = telegram.Updater(generalconfig['token'], workers=10)
     getBot  = updater.bot.getMe()
 
-    api = HyphanAPI(updater, config)
+    hyphan_api = api.HyphanAPI(updater, config)
 
     # Dispatch modules
     dp = updater.dispatcher
-    loadModules(api, updater)
+    dispatcher.loadModules(hyphan_api, updater)
     dp.addErrorHandler(error)
 
     # Start the bot
     updater.start_polling()
 
     # Notify that the bot started
-    if notify:
+    try:
+        import notify2
         notify2.init(getBot.username)
         notify2.Notification("Initialized {}".format(getBot.first_name),
                              "{} has started".format(getBot.username),
                              "notification-message-im").show()
-    else:
-        logger.info("Not initializing 'notify2' module")
+        notify = True
+    except ImportError:
+        logger.warning("Unable to import 'notify2' module")
+
+    except:
+        logger.error("X11 or Dbus isn't running")
         logger.info("Initialized %s (%s)." % (getBot.first_name, getBot.username))
 
     updater.idle()

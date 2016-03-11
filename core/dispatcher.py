@@ -40,7 +40,7 @@ def loadModules(api, updater):
                 modapi = api.Mod(api, mod.__name__)
                 os.chdir(i['location'])
                 mod.dispatch(modapi, updater)
-                os.chdir(HYPHAN_DIR+"/core")
+                os.chdir(HYPHAN_DIR + "/core")
             elif "Dispatch" in dir(mod):
                 modapi = api.Mod(api, mod.__name__)
                 os.chdir(i['location'])

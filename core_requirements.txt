@@ -1,5 +1,4 @@
 ## All required modules to install ##
-
 # Use the following command to install these modules:
 # pip3 install -r core_requirements.txt
 

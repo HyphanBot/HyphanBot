@@ -31,8 +31,9 @@ def getMods(logger):
 
     for path in paths:
         if not pathlib.Path(path).exists():
-                continue
-            possibleMods = os.listdir(path)
+            continue
+
+        possibleMods = os.listdir(path)
 
         for mod in possibleMods: # iterate through the list
             if mod == "__pycache__" or mod[-1] == "~": # ignore backup files
@@ -48,11 +49,12 @@ def getMods(logger):
                     location = path
                     modName = mod.split(".")[0]
                     mainModule = modName
-            elif not mainModule+".py" in os.listdir(location): # If main.py is not found in the mod directory...
+
+            elif not mainModule + ".py" in os.listdir(location):
                 logger.warn("Not loading mod '%s': Entry point '%s.py' not found." % (mod, mainModule))
-                    continue
-                mods.append({ "name": modName, "location": location, "path": location+"/"+mainModule+".py", "main": mainModule })
-                logger.info("Found mod '%s'." % modName)
+
+            mods.append({ "name": modName, "location": location, "path": location + "/" + mainModule + ".py", "main": mainModule })
+            logger.info("Found mod '%s'." % modName)
 
     return mods
 
