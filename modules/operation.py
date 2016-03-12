@@ -54,11 +54,11 @@ class Commands(object):
     def noslash(self, bot, update):
         msg = update.message.text
         if msg == "quit":
-            quit(bot, update)
+            self.quit(bot, update)
         elif msg == "restart":
-            restart(bot, update)
+            self.restart(bot, update)
         elif msg == "reloadconf" or msg == "reconf":
-            reload_config(bot, update)
+            self.reload_config(bot, update)
 
 class Dispatch(object):
     def __init__(self, api, updater):

@@ -36,12 +36,12 @@ class Commands(object):
         if msg[len(msg) - 2:] == ".." and msg[len(msg) - 3:] != "...":
             bot.sendMessage(chat_id=update.message.chat_id, text="Three dots, Nick.")
 
-    def noslash(self, bot, update):
+    def noslash(self, bot, update, args):
         msg = update.message.text
         if msg == "help":
-            help_cmd(bot, update)
+            self.help_cmd(bot, update, args)
         elif msg == "about":
-            about(bot, update)
+            self.about(bot, update)
 
 class Dispatch(object):
     def __init__(self, api, updater):

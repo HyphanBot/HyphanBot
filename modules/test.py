@@ -55,9 +55,9 @@ class Commands(object):
         msg = update.message.text.lower()
 
         if msg == "hello":
-            hello(bot, update)
+            self.hello(bot, update)
         elif msg.startswith("goodbye"):
-            goodbye(bot, update, args)
+            self.goodbye(bot, update, args)
 
 # Dispatch class. This is the core of every mod.
 # This is what Hyphan calls to initialize the mod.
