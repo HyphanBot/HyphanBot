@@ -16,13 +16,15 @@ https://www.gnu.org/licenses/agpl-3.0.html>.
 -----
 This mod operates the bot. It can quit or restart Hyphan.
 '''
-import os, signal, sys
+import os
+import signal
 
 class Commands(object):
+    """Define the program logic"""
     def quit(self, bot, update):
-        if api.api.is_sender_admin(update): # Use the API to check if sender is admin
-            bot.sendMessage(chat_id=update.message.chat_id,
-                            text="Goodbye!")
+        """Quit hyphan"""
+        if API.api.is_sender_admin(update): # Use the API to check if sender is admin
+            bot.sendMessage(chat_id=update.message.chat_id, text="Goodbye!")
             os.kill(os.getpid(), signal.SIGTERM)
         else:
             bot.sendMessage(chat_id=update.message.chat_id,
@@ -30,11 +32,10 @@ class Commands(object):
                             % update.message.from_user.first_name)
 
     def restart(self, bot, update):
+        """Restart the bot if it's run using run.sh (most of the logic is a simple bash if)"""
         # This will only restart the bot if it was running from the launcher script
-        if api.api.is_sender_admin(update): # Use the API to check if sender is admin
-            bot.sendMessage(chat_id=update.message.chat_id,
-                            text="See ya!")
-            print(__file__)
+        if API.api.is_sender_admin(update): # Use the API to check if sender is admin
+            bot.sendMessage(chat_id=update.message.chat_id, text="See ya!")
             os.kill(os.getpid(), signal.SIGKILL)
         else:
             bot.sendMessage(chat_id=update.message.chat_id,
@@ -42,8 +43,9 @@ class Commands(object):
                             % update.message.from_user.first_name)
 
     def reload_config(self, bot, update):
-        if api.api.is_sender_admin(update):
-            api.api.config.refresh_config()
+        """Reload the configuration file."""
+        if API.api.is_sender_admin(update):
+            API.api.config.refresh_config()
             bot.sendMessage(chat_id=update.message.chat_id,
                             text="Configuration file reloaded.")
         else:
@@ -52,6 +54,7 @@ class Commands(object):
                             % update.message.from_user.first_name)
 
     def noslash(self, bot, update):
+        """Use strings or words instead of commands"""
         msg = update.message.text
         if msg == "quit":
             self.quit(bot, update)
@@ -61,20 +64,25 @@ class Commands(object):
             self.reload_config(bot, update)
 
 class Dispatch(object):
+    """Define the commands"""
     def __init__(self, api, updater):
-        self.define_commands(updater)
-        self.set_api(api)
+        self.api = api
+        self.updater = updater
+        self.define_commands()
+        self.set_api()
 
-    def set_api(self, temp):
-        global api
-        api = temp
+    def set_api(self):
+        """Set the global variable API for use inside of the program logic as well."""
+        global API
+        API = self.api
 
-    def define_commands(self, updater):
-        dp = updater.dispatcher
-        c = Commands()
+    def define_commands(self):
+        """Bind the commands"""
+        dispr = self.updater.dispatcher
+        cods = Commands()
 
-        dp.addTelegramCommandHandler("quit", c.quit)
-        dp.addTelegramCommandHandler("restart", c.restart)
-        dp.addTelegramCommandHandler("reloadconf", c.reload_config)
-        dp.addTelegramCommandHandler("reconf", c.reload_config)
-        dp.addTelegramMessageHandler(c.noslash)
+        dispr.addTelegramCommandHandler("quit", cods.quit)
+        dispr.addTelegramCommandHandler("restart", cods.restart)
+        dispr.addTelegramCommandHandler("reloadconf", cods.reload_config)
+        dispr.addTelegramCommandHandler("reconf", cods.reload_config)
+        dispr.addTelegramMessageHandler(cods.noslash)

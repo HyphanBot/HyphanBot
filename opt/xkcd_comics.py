@@ -17,7 +17,9 @@ https://www.gnu.org/licenses/agpl-3.0.html>.
 import xkcd
 
 class Commands(object):
+    """The program logic of the hyphan commands"""
     def get_comic(self, bot, update, args):
+        """Fetch the comics"""
         if len(args) == 0:
             bot.sendMessage(chat_id=update.message.chat_id,
                             text="Please specify which comic you want to read.")
@@ -35,31 +37,39 @@ class Commands(object):
                                                                        comic.getAltText()))
 
     def random(self, bot, update):
+        """Alias for fetching a random comic"""
         return self.get_comic(bot, update, ["random"])
 
     def latest(self, bot, update):
+        """Same but for the latest comic"""
         return self.get_comic(bot, update, ["latest"])
 
-class dispatch(object):
+class Dispatch(object):
+    """Make Telegram accept the commands"""
     def __init__(self, api, updater):
-        self.define_commands(updater)
-        self.define_help(api)
+        self.api = api
+        self.updater = updater
+        self.define_commands()
+        self.define_help()
 
-    def define_commands(self, updater):
-        dp = updater.dispatcher
-        c = Commands()
+    def define_commands(self):
+        """Define the commands"""
+        dispr = self.updater.dispatcher
+        cods = Commands()
 
-        dp.addTelegramCommandHandler("xkcd", c.get_comic)
-        dp.addTelegramCommandHandler("xkcd_random", c.random)
-        dp.addTelegramCommandHandler("xkcdr", c.random)
-        dp.addTelegramCommandHandler("xkcd_latest", c.latest)
-        dp.addTelegramCommandHandler("xkcdl", c.latest)
+        dispr.addTelegramCommandHandler("xkcd", cods.get_comic)
+        dispr.addTelegramCommandHandler("xkcd_random", cods.random)
+        dispr.addTelegramCommandHandler("xkcdr", cods.random)
+        dispr.addTelegramCommandHandler("xkcd_latest", cods.latest)
+        dispr.addTelegramCommandHandler("xkcdl", cods.latest)
 
-    def define_help(self, api):
-        api.set_help("xkcd", "Gives you either a specified, random or the latest xkcd comic.\n/`xkcd [random, latest, comicid]`")
+    def define_help(self):
+        """Define the help messages"""
+        self.api.set_help("xkcd", "Gives you either a specified, random or the latest xkcd " \
+                          "comic.\n`xkcd [random, latest, comicid]`")
 
         for alias in ["xkcdr", "xkcd_random"]:
-            api.set_help(alias, "An alias for `/xkcd random`.")
+            self.api.set_help(alias, "An alias for `/xkcd random`.")
 
         for alias in ["xkcdl", "xkcd_latest"]:
-            api.set_help(alias, "An alias for `/xkcd latest`.")
+            self.api.set_help(alias, "An alias for `/xkcd latest`.")

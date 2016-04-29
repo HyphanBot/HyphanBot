@@ -16,9 +16,10 @@ https://www.gnu.org/licenses/agpl-3.0.html>.
 '''
 from telegram import ParseMode
 
-def devChannel(bot, update, args):
-    if api.api.is_sender_admin(update):
-        channel = api.get_config("channel")
+def devchannel(bot, update, args):
+    """Post to the Hyphan development channel"""
+    if API.api.is_sender_admin(update):
+        channel = API.get_config("channel")
         bot.sendMessage(chat_id=channel, text=" ".join(args), parse_mode=ParseMode.MARKDOWN)
     else:
         bot.sendMessage(chat_id=update.message.chat_id, text="*You're not admin.*",
@@ -26,18 +27,25 @@ def devChannel(bot, update, args):
 
 # Development commands
 class Dispatch(object):
+    """Defines the metadata for hyphan"""
     def __init__(self, api, updater):
-        self.define_commands(updater)
-        self.define_help(api)
-        self.set_api(api)
+        self.api = api
+        self.updater = updater
+        self.define_commands()
+        self.define_help()
+        self.set_api()
 
-    def set_api(self, temp):
-        global api
-        api = temp
+    def set_api(self):
+        """Set the api for use in the logic"""
+        global API
+        API = self.api
 
-    def define_commands(self, updater):
-        dp = updater.dispatcher
-        dp.addTelegramCommandHandler("devpost", devChannel)
+    def define_commands(self):
+        """Bind the commands"""
+        dispr = self.updater.dispatcher
+        dispr.addTelegramCommandHandler("devpost", devchannel)
 
-    def define_help(self, api):
-        api.set_help('devpost', 'Send a message to the development channel.\n/devpost [message]')
+    def define_help(self):
+        """Set the help messages"""
+        self.api.set_help('devpost', 'Send a message to the development channel.\n/devpost" \
+        " [message]')

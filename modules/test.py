@@ -27,30 +27,37 @@ command mods work.
 
 # Create a class where you can define the commands
 class Commands(object):
+    """Define the program logic of the module. Only used as a namespace to enforce a, slightly,
+    more sensible layout for the program"""
     # Function that defines your mod. This will be called when the command
     # is executed.
     # In this example, the message will be provided from the configuration file.
     def hello(self, bot, update):
-        bot.sendMessage(chat_id=update.message.chat_id, text="{}".format(api.get_config("message")))
+        """Return the string that is defined in the configuration file"""
+        bot.sendMessage(chat_id=update.message.chat_id, text="{}".format(API.get_config("message")))
 
     # A mod can also dispatch more than one command.
     # The following is an example of a function that gets called when another
     # command is executed.
     def goodbye(self, bot, update, args):
+        """Return the string Goodbye ARGS!"""
         if len(args) != 0:
-            bot.sendMessage(chat_id=update.message.chat_id, text="Goodbye {}!".format(' '.join(args)))
+            bot.sendMessage(chat_id=update.message.chat_id, text="Goodbye {}!" \
+                            .format(' '.join(args)))
         else:
-            bot.self, sendMessage(chat_id=update.message.chat_id, text="Goodbye!")
+            bot.sendMessage(chat_id=update.message.chat_id, text="Goodbye!")
 
     # The following functions handle regular messages. These examples define
     # commands that are executed without slashes at the beginning.
     def stupid(self, bot, update):
+        """stupid human!"""
         msg = update.message.text.lower()
 
         if msg == "stupid bot" or msg == "stupid bot!" or msg == "stupid bot.":
             bot.sendMessage(chat_id=update.message.chat_id, text="Stupid human.")
 
     def noslash(self, bot, update, args):
+        """Bind the commands using words or sentences instead of purely commands"""
         # get the message
         msg = update.message.text.lower()
 
@@ -62,53 +69,56 @@ class Commands(object):
 # Dispatch class. This is the core of every mod.
 # This is what Hyphan calls to initialize the mod.
 class Dispatch(object):
+    """Deals with the various metadata that Hyphan requires including help messages and the like"""
     # run definitions on launch
     def __init__(self, api, updater):
-        self.set_api(api)
-        self.set_config(api)
-        self.define_help(api)
-        self.define_commands(updater)
+        global API
+        API = api
 
-    # set the global api variable
-    def set_api(self, temp):
-        global api
-        api = temp
+        self.api = api
+        self.updater = updater
+        self.set_config()
+        self.define_help()
+        self.define_commands()
 
     ## Dispatching! ##
     # Check and set the config with default keys.
     # This will be under your mod's section (identified by your mod's filename
     # (without the extention), in this case 'test')
-    def set_config(self, api):
-        if not api.get_config():
+    def set_config(self):
+        """Set the configuration values if they do not exist yet"""
+        if not self.api.get_config():
             default_keys = {
                 "enabled": "yes",
                 "message": "Hello!"
             }
-            api.set_config(default_keys)
+            self.api.set_config(default_keys)
 
     # Assign commands to the defs
-    def define_commands(self, updater):
+    def define_commands(self):
+        """Bind the commands to the functions"""
         # Get dispatcher
-        dp = updater.dispatcher
+        dispr = self.updater.dispatcher
 
         # Get the commands
         commands = Commands()
 
         # This listens for the command "/goodbye" and calls the goodbye() function if the
         # command is executed
-        dp.addTelegramCommandHandler("goodbye", commands.goodbye)
+        dispr.addTelegramCommandHandler("goodbye", commands.goodbye)
 
         # You can also handle the same functionaltiy for multiple commands:
-        dp.addTelegramCommandHandler("hello", commands.hello)
-        dp.addTelegramCommandHandler("morning", commands.hello)
-        dp.addTelegramCommandHandler("hi", commands.hello)
+        dispr.addTelegramCommandHandler("hello", commands.hello)
+        dispr.addTelegramCommandHandler("morning", commands.hello)
+        dispr.addTelegramCommandHandler("hi", commands.hello)
 
         # A command that will execute will no slash
-        dp.addTelegramMessageHandler(commands.stupid)
-        dp.addTelegramMessageHandler(commands.noslash)
+        dispr.addTelegramMessageHandler(commands.stupid)
+        dispr.addTelegramMessageHandler(commands.noslash)
 
     # Assigns help messages to the commands
-    def define_help(self, api):
+    def define_help(self):
+        """Adds help messages to the commands"""
         # Adds help text to the commands
-        api.set_help('goodbye', "Says goodbye to you when you ask for it.")
-        api.set_help('hello', 'Hello world!')
+        self.api.set_help('goodbye', "Says goodbye to you when you ask for it.")
+        self.api.set_help('hello', 'Hello world!')
