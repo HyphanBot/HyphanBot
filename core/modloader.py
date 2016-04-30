@@ -28,7 +28,11 @@ def getMods(logger):
     home       = expanduser("~")
     mainModule = "main"
     mods       = []
-    paths      = [HYPHAN_DIR + "/modules", home + "/.hyphan/mods", home + "/.config/hyphan/mods"]
+    paths      = [
+         HYPHAN_DIR + "/modules",
+         HYPHAN_DIR + "/opt",
+         home + "/.hyphan/mods",
+         home + "/.config/hyphan/mods"]
 
     for path in paths:
         if not pathlib.Path(path).exists():
@@ -46,10 +50,13 @@ def getMods(logger):
 
             # Check if the mod is not in its own directory and include it.
             if not os.path.isdir(location):
-                if location.endswith(".py"):
-                    location = path
-                    modName = mod.split(".")[0]
-                    mainModule = modName
+                if "." in location:
+                    if location.endswith(".py"):
+                        location = path
+                        modName = mod.split(".")[0]
+                        mainModule = modName
+                    else:
+                        continue
 
             elif not mainModule + ".py" in os.listdir(location):
                 logger.warn("Not loading mod '%s': Entry point '%s.py' not found." % (mod, mainModule))
