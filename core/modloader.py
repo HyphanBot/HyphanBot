@@ -17,6 +17,7 @@ https://www.gnu.org/licenses/agpl-3.0.html>.
 
 from importlib.machinery import *
 from os.path import expanduser
+from constants import HYPHAN_DIR
 import importlib
 import sys
 import os
@@ -27,7 +28,7 @@ def getMods(logger):
     home       = expanduser("~")
     mainModule = "main"
     mods       = []
-    paths      = ["../modules", home + "/.hyphan/mods", home + "/.config/hyphan/mods"]
+    paths      = [HYPHAN_DIR + "/modules", home + "/.hyphan/mods", home + "/.config/hyphan/mods"]
 
     for path in paths:
         if not pathlib.Path(path).exists():
