@@ -18,5 +18,8 @@ https://www.gnu.org/licenses/agpl-3.0.html>.
 import logging
 
 def dispatch(mod, updater):
-        logger = logging.getLogger(__name__)
-        logger.info("Module loading initialized.")
+    """
+    A test to check and inform that mods can be loaded and dispatched
+    """
+    logger = logging.getLogger(__name__)
+    logger.info("Module loading initialized.")

@@ -18,7 +18,7 @@ This is an example of how a Hyphan mod is structured.
 
 A "Mod" is basically a plugin or extention that extends Hyphan by adding
 extra features and abilities to the bot.
-The reason why they're called 'Mods' instead of 'modules' is to not
+The reason why they are called 'Mods' instead of 'modules' is to not
 confuse them with Python modules, since Hyphan is written in Python.
 
 The following code and comments describes the basic structure of how
