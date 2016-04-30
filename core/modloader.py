@@ -15,37 +15,38 @@ License along with Hyphan.  If not, see
 https://www.gnu.org/licenses/agpl-3.0.html>.
 '''
 
-from importlib.machinery import *
+from importlib.machinery import SourceFileLoader
 from os.path import expanduser
 from constants import HYPHAN_DIR
-import importlib
-import sys
+
 import os
 import pathlib
 
-# Gets and loads mods from the modules directory.
-def getMods(logger):
-    home       = expanduser("~")
-    mainModule = "main"
-    mods       = []
-    paths      = [
-         HYPHAN_DIR + "/modules",
-         HYPHAN_DIR + "/opt",
-         home + "/.hyphan/mods",
-         home + "/.config/hyphan/mods"]
+def get_mods(logger):
+    """
+    Gets and loads mods from the modules directory.
+    """
+    home = expanduser("~")
+    main_module = "main"
+    mods = []
+    paths = [
+        HYPHAN_DIR + "/modules",
+        HYPHAN_DIR + "/opt",
+        home + "/.hyphan/mods",
+        home + "/.config/hyphan/mods"]
 
     for path in paths:
         if not pathlib.Path(path).exists():
             continue
 
-        possibleMods = os.listdir(path)
+        possible_mods = os.listdir(path)
 
-        for mod in possibleMods: # iterate through the list
+        for mod in possible_mods: # iterate through the list
             if mod == "__pycache__" or mod[-1] == "~": # ignore backup files
                 continue
 
-            mainModule = "main" # Reset the variable to "main" for every loop
-            modName = mod
+            main_module = "main" # Reset the variable to "main" for every loop
+            mod_name = mod
             location = os.path.join(path, mod)
 
             # Check if the mod is not in its own directory and include it.
@@ -53,19 +54,24 @@ def getMods(logger):
                 if "." in location:
                     if location.endswith(".py"):
                         location = path
-                        modName = mod.split(".")[0]
-                        mainModule = modName
+                        mod_name = mod.split(".")[0]
+                        main_module = mod_name
                     else:
                         continue
 
-            elif not mainModule + ".py" in os.listdir(location):
-                logger.warn("Not loading mod '%s': Entry point '%s.py' not found." % (mod, mainModule))
+            elif not main_module + ".py" in os.listdir(location):
+                logger.warning("Not loading mod '%s': '%s.py' not found." % (mod, main_module))
 
-            mods.append({ "name": modName, "location": location, "path": location + "/" + mainModule + ".py", "main": mainModule })
-            logger.info("Found mod '%s'." % modName)
+            mods.append(
+                {"name": mod_name,
+                 "location": location,
+                 "path": location + "/" + main_module + ".py",
+                 "main": main_module})
+
+            logger.info("Found mod '%s'." % mod_name)
 
     return mods
 
-def loadMod(mod):
-    # load the mod. This basically imports it.
+def load_mod(mod):
+    """ Loads the mod, basically importing it. """
     return SourceFileLoader(mod["name"], mod["path"]).load_module()

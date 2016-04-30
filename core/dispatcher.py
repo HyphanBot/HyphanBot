@@ -20,17 +20,20 @@ from modloader import *
 import logging
 import traceback
 
-def loadModules(api, updater):
+def load_modules(api, updater):
+    """
+    Loads and runs HyphanBot's mods.
+    """
     logger = logging.getLogger(__name__)
     # Get, load, and dispatch all mods found in the modules folder
-    for i in getMods(logger):
+    for i in get_mods(logger):
         # Check if mod is enabled in config. If so, call its dispatch().
         # It's enabled by default.
         modenabled = bool(api.config.config.getboolean(i['name'], "enabled", fallback="true"))
         if modenabled:
             # This does some weird shenanigans.
             try:
-                mod = loadMod(i) # Load the mod
+                mod = load_mod(i) # Load the mod
                 logger.info("Mod %s has been loaded." % i['name'])
             except:
                 logger.error("Cannot load mod %s." % i['name'])
@@ -47,7 +50,7 @@ def loadModules(api, updater):
                 mod.Dispatch(modapi, updater)
                 os.chdir(HYPHAN_DIR + "/core")
             else:
-                logger.warn("Cannot dispatch mod '%s': dispatch() is missing." % mod.__name__)
+                logger.warning("Cannot dispatch mod '%s': dispatch() is missing." % mod.__name__)
 
         else:
-            logger.warn("Mod %s is disabled." % i['name'])
+            logger.warning("Mod %s is disabled." % i['name'])

@@ -15,6 +15,7 @@ License along with Hyphan.  If not, see
 https://www.gnu.org/licenses/agpl-3.0.html>.
 '''
 
+import logging
 import telegram
 
 # project specific
@@ -22,16 +23,14 @@ import configurator
 import dispatcher
 import api
 
-import logging
-import os
-import sys
-
 ## Get Hyphan's root directory from the environment variable (exported in run.sh)
 #HYPHAN_DIR = os.getenv('HYPHAN_DIR', os.path.dirname(os.getcwd()))
 
 # Log everything
-# filter for the stupid shit python-telegram-bot reports
 class Filter(logging.Filter):
+    """
+    filter for the stupid shit python-telegram-bot reports
+    """
     def filter(self, record):
         message = record.getMessage()
         if message == "No new updates found.":
@@ -45,32 +44,37 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s [%(levelname)s]: %(message)s',
     level=logging.INFO) # change this to logging.INFO to enable verbose mode
 
-logger      = logging.getLogger(__name__)
-mainlog     = logging.getLogger("__main__")
+logger = logging.getLogger(__name__)
+
+mainlog = logging.getLogger("__main__")
 telegramlog = logging.getLogger("telegram.bot")
+
 telegramlog.addFilter(Filter())
 mainlog.addFilter(Filter())
 
 def error(bot, update, error):
-    logger.warn('Error occured in update, "%s": %s' % (update, error))
+    """ Error handler for updates """
+    logger.warning('Error occured in update, "%s": %s' % (update, error))
     try:
         notify2.Notification("Error occured in update '%s': '%s'" % (update, error))
     except:
-        pass # Who cares?
+        # Go along as if nothing ever happened...
+        pass
 
 def start_bot():
+    """ HyphanBot's entry point ('__main__' function call) """
     # Initialize config
     config = configurator.Configurator()
     generalconfig = config.parse_general()
 
     updater = telegram.Updater(generalconfig['token'], workers=10)
-    getBot  = updater.bot.getMe()
+    get_bot = updater.bot.getMe()
 
     hyphan_api = api.HyphanAPI(updater, config)
 
     # Dispatch modules
     dp = updater.dispatcher
-    dispatcher.loadModules(hyphan_api, updater)
+    dispatcher.load_modules(hyphan_api, updater)
     dp.addErrorHandler(error)
 
     # Start the bot
@@ -79,16 +83,16 @@ def start_bot():
     # Notify that the bot started
     try:
         import notify2
-        notify2.init(getBot.username)
-        notify2.Notification("Initialized {}".format(getBot.first_name),
-                             "{} has started".format(getBot.username),
+        notify2.init(get_bot.username)
+        notify2.Notification("Initialized {}".format(get_bot.first_name),
+                             "{} has started".format(get_bot.username),
                              "notification-message-im").show()
     except ImportError:
         logger.warning("Unable to import 'notify2' module")
     except:
         logger.error("X11 or Dbus isn't running")
 
-    logger.info("Initialized %s (%s)." % (getBot.first_name, getBot.username))
+    logger.info("Initialized %s (%s)." % (get_bot.first_name, get_bot.username))
 
     updater.idle()
 

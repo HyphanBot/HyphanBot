@@ -15,15 +15,8 @@ License along with Hyphan.  If not, see
 https://www.gnu.org/licenses/agpl-3.0.html>.
 '''
 
-from os import mkdir
-from os.path import expanduser
-
-import pathlib
 import main
 import logging
-
-global helptext
-helptext = {}
 
 """
 This module contains the HyphanAPI class which intends to provide api
@@ -38,25 +31,40 @@ class HyphanAPI:
     Args:
             updater (telegram.Updater): The updater object that could be
                     used in mods.
-            config  (Configurator)    : The configuration object that is
+            config  (Configurator): The configuration object that is
                     used to parse and access the configuration file.
     """
     def __init__(self, updater, config):
         self.updater = updater
-        self.main    = main
-        self.config  = config
-        self.logger  = logging.getLogger(__name__)
+        self.main = main
+        self.config = config
+        self.helptext = {}
+        self.logger = logging.getLogger(__name__)
 
     def get_admins(self):
+        """ Returns the specified list of bot admins from the config file """
         return self.config.parse_general()['adminlist']
 
     def is_admin(self, username):
+        """
+        Returns True if the given username is found in the admin list
+
+        Args:
+            username (String): The Telegram username of the user.
+        """
         return username in self.get_admins()
 
     def is_sender_admin(self, update):
+        """
+        Returns True if the message sender's username is a bot admin
+
+        Args:
+            update (telegram.Update): The bot's update object.
+        """
         return self.is_admin(update.message.from_user.username)
 
     def get_updater(self):
+        """ Returns the active Updater object """
         return self.updater
 
     class Mod:
@@ -65,22 +73,30 @@ class HyphanAPI:
 
         Args:
                 api  (HyphanAPI): The base api object the mod will use.
-                name (string)   : The name of the mod.
+                name (string): The name of the mod.
         """
         def __init__(self, api, name):
-            self.api    = api
-            self.name   = name
+            self.api = api
+            self.name = name
             self.logger = logging.getLogger(__name__)
 
         def section_exists(self):
-            if self.name in self.api.config.get_sections():
-                return True
-            else:
-                return False
+            """ Returns True if the mod's section exists in the config file """
+            return self.name in self.api.config.get_sections()
 
         def get_config(self, key=None, fallback=None):
+            """
+            Returns the key value from the config file if specified,
+            otherwise returns whether the mod's section exists in the
+            config file.
+
+            Args:
+                key (String): The key to get from the config file.
+                fallback (String): The default value if the key is not specified
+                    in the config file.
+            """
             if self.name not in self.api.config.get_sections():
-                self.logger.warn("Missing config section for mod '%s'" % self.name)
+                self.logger.warning("Missing config section for mod '%s'" % self.name)
                 if key != None:
                     return self.api.config.access(self.name, key, fallback)
                 else:
@@ -92,14 +108,34 @@ class HyphanAPI:
                     return True
 
         def set_config(self, data):
+            """
+            Sets and returns key data to append to the configuration file.
+
+            Args:
+                data (Dictionary): Dictionary object that contains key-value data
+                    to append to the config file.
+            """
             return self.api.config.append(self.name, data)
 
         def set_help(self, module, text):
-            helptext[str(module)] = text
+            """
+            Sets and stores the help text for a mod.
+
+            Args:
+                module (String): The mod's name.
+                text (String): The help text.
+            """
+            self.api.helptext[str(module)] = text
 
         def get_help(self, module):
+            """
+            Retrieves and returns the mod's help text if it exists.
+
+            Args:
+                module (String): The mod's name.
+            """
             module = ''.join(module)
-            if module in helptext:
-                return helptext[module]
+            if module in self.api.helptext:
+                return self.api.helptext[module]
             else:
                 return "Help isn't coming..."
