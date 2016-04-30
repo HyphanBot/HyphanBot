@@ -15,14 +15,15 @@ License along with Hyphan.  If not, see
 https://www.gnu.org/licenses/agpl-3.0.html>.
 '''
 
-from telegram import ParseMode
-#from tdqm import tdqm # Progress bar module. Install: pip install tqdm
 from os import path
 import threading
+import logging
 import random
 import time
+
 import requests
-import logging
+from telegram import ParseMode
+#from tdqm import tdqm # Progress bar module. Install: pip install tqdm
 
 '''
 Hyphan experiment: Shiritori/Word_Chain game module
@@ -33,7 +34,12 @@ TODO: Implement score system based on https://shiritorigame.com
 '''
 
 class Shiritori(object):
-    """docstring for Shiritori"""
+    """
+    Shiritori game.
+
+    Args:
+        mod (core.HyphanAPI.Mod): Mod's local API
+    """
     def __init__(self, mod):
         self.logger = logging.getLogger(__name__)
 
@@ -44,33 +50,40 @@ _Shiritori_ originated in Japan. The word "Shiritori" literally means "taking th
 I can only play this game in English. I'm currently hard to beat and I might use really long words, but I was just taught to not be fair... Sorry.
 To start a match with me, type:
     `/shiritori start` or `/wordchain start`
-""";
+"""
 
-        self.limit = mod.get_config("timelimit", 30) # The constant time limit for each turn in seconds (default: 30)
+        # The constant time limit for each turn in seconds (default: 30)
+        self.limit = mod.get_config("timelimit", 30)
         self.timer = self.limit # Remaining time in seconds
 
-        self.startscore = mod.get_config("startscore", 100) # The score at the beginning of the game (default: 100)
-        self.score      = self.startscore # The user's score
-        self.pc_score   = self.startscore # Hyphan's score
+        # The score at the beginning of the game (default: 100)
+        self.startscore = mod.get_config("startscore", 100)
+        self.score = self.startscore # The user's score
+        self.pc_score = self.startscore # Hyphan's score
 
-        self.minlen = mod.get_config("minimumlength", 3) # The minimum number of characters allowed (default: 3)
+        # The minimum number of characters allowed (default: 3)
+        self.minlen = mod.get_config("minimumlength", 3)
 
         # Message if user wins (default: "Senpai, tell me your secrets!")
-        self.winmsg  = mod.get_config("winmessage", "Senpai, tell me your secrets!")
+        self.winmsg = mod.get_config("winmessage", "Senpai, tell me your secrets!")
 
         # Message if user loses (default: "This was so predictable, hehe.")
         self.losemsg = mod.get_config("losemessage", "This was so predictable, hehe.")
 
         # Gets and downloads the wordlist if not already downloaded
-        self.wordlist = self.get_wordlist(mod.get_config("wlurl", "https://techisized.com/hyphanbot/SCOWL-wl/words.txt"),
-                                mod.get_config("wlsavename", "shiritori_wordlist.txt"))
+        self.wordlist = self.get_wordlist(
+            mod.get_config("wlurl", "https://techisized.com/hyphanbot/SCOWL-wl/words.txt"),
+            mod.get_config("wlsavename", "shiritori_wordlist.txt"))
 
-        self.started    = False
-        self.lastword   = None
+        self.started = False
+        self.lastword = None
         self.used_words = []
-        self.uturn      = False # determines if it's the user's turn.
+        self.uturn = False # determines if it's the user's turn.
 
     def set_timer(self, bot, update):
+        """
+        Timer thread method. This will run on the user's turn each time.
+        """
         while self.started:
             if self.uturn:
                 if not self.timer <= 0:
@@ -98,6 +111,9 @@ Player: %s
                 time.sleep(0.1)
 
     def start_game(self, bot, update, args):
+        """
+        Initiates a game of shiritori. Called on command.
+        """
         if len(args) is 1 and args[0] == "start":
             self.started = True
             self.timer = self.limit
@@ -110,11 +126,16 @@ Player: %s
             timerthread.start()
             self.pc_turn(bot, update)
         else:
-            bot.sendMessage(chat_id=update.message.chat_id, text=self.helptext, parse_mode=ParseMode.MARKDOWN)
+            bot.sendMessage(chat_id=update.message.chat_id, text=self.helptext,
+                            parse_mode=ParseMode.MARKDOWN)
 
     def pc_turn(self, bot, update, word=None):
+        """
+        Picks a random word from the wordlist based on the user's last word. This
+        method is called on Hyphan's turn each time.
+        """
         self.uturn = False
-        if word == None:
+        if word is None:
             # If there is no given user word (if the game was just started), choose a random word.
             response = random.choice(self.wordlist)
         else:
@@ -123,7 +144,8 @@ Player: %s
             while (chosen_word in self.used_words) or (len(chosen_word) == 1):
                 # As long as the word is used or is one letter, keep chosing another word.
                 # This prevents Hyphan from losing.
-                chosen_word = random.choice(list(filter(lambda x: x[0] == word[-1:], self.wordlist)))
+                chosen_word = random.choice(
+                    list(filter(lambda x: x[0] == word[-1:], self.wordlist)))
             self.pc_score = self.pc_score - (len(chosen_word) - self.minlen)
             response = chosen_word
         self.lastword = response
@@ -143,6 +165,9 @@ Player: %s
             self.uturn = True
 
     def shiritori(self, bot, update):
+        """
+        Message handler. Handles the user's messages during gameplay.
+        """
         currentchat = update.message.chat_id
         message = update.message.text.lower()
         response = None
@@ -154,7 +179,8 @@ Player: %s
                 response = "'%s' is not found in my word list! Try again!" % message
                 valid_word = False
             if not message.startswith(self.lastword[-1:]):
-                response = "'%s' does not start with '%s'. Try again!" % (message, self.lastword[-1:])
+                response = "'%s' does not start with '%s'. Try again!" % (
+                    message, self.lastword[-1:])
                 valid_word = False
             if len(message) == 1:
                 response = "Cannot be a letter, has to be a word. Try again!"
@@ -182,8 +208,11 @@ Player: 0 (real score: %s)
                 bot.sendMessage(chat_id=self.gamechat, text=response)
 
     def get_wordlist(self, url, filename="shiritori_wordlist.txt"):
+        """
+        Retrieves and downloads the wordlist on initializaton for use in the game.
+        """
         if not path.exists(filename):
-            self.logger.info("Wordlist for shiritori not found; downloading new list. This can take a while...")
+            self.logger.info("Wordlist not found; downloading new list. This can take a while.")
             r = requests.get(url, stream=True)
             filesize = len(r.content)
             with open(filename, 'wb') as filehandle:
@@ -195,25 +224,31 @@ Player: 0 (real score: %s)
                         content_progress.set_description("Downloading wordlist")
                         filehandle.write(chunk) # Download them words
                 except ImportError:
-                    self.logger.info("'tdqm' module failed to import; not displaying progressbar.")
+                    self.logger.info("'tdqm' failed to import; not showing progressbar.")
                     self.logger.info("Downloading wordlist...")
                     for chunk in r.iter_content():
                         filehandle.write(chunk) # Download them words
                 self.logger.info("New wordlist saved to 'shiritori/%s'" % filename)
         with open(filename, 'r') as filehandle:
-            wordlist = [word.strip().lower() for word in filehandle] # Make them words go naked and bend over
-        wordlist = list(filter(lambda x: "'s" not in x, wordlist)) # Filter out all them damned 's
-        wordlist = list(filter(lambda x: len(x) < 30, wordlist)) # Filter them ugly fat words longer than 30 characters, if any
+            # Make them words go naked and bend over
+            wordlist = [word.strip().lower() for word in filehandle]
+
+        # Filter out all them damned 's
+        wordlist = list(filter(lambda x: "'s" not in x, wordlist))
+
+        # Filter them ugly fat words longer than 30 characters, if any
+        wordlist = list(filter(lambda x: len(x) < 30, wordlist))
+
         return wordlist # Bring 'em to me!!
 
 class Dispatch(object):
-    """docstring for Dispatch"""
+    """ Adds the required Telegram handlers to run the game """
     def __init__(self, mod, updater):
         dp = updater.dispatcher
 
-        shiritoriGame = Shiritori(mod)
-        dp.addTelegramCommandHandler("shiritori", shiritoriGame.start_game)
-        dp.addTelegramCommandHandler("wordchain", shiritoriGame.start_game)
-        dp.addTelegramMessageHandler(shiritoriGame.shiritori)
+        shiritori_game = Shiritori(mod)
+        dp.addTelegramCommandHandler("shiritori", shiritori_game.start_game)
+        dp.addTelegramCommandHandler("wordchain", shiritori_game.start_game)
+        dp.addTelegramMessageHandler(shiritori_game.shiritori)
 
-        mod.set_help("shiritori", shiritoriGame.helptext)
+        mod.set_help("shiritori", shiritori_game.helptext)
