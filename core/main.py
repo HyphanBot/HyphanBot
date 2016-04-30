@@ -54,9 +54,12 @@ mainlog.addFilter(Filter())
 def error(bot, update, error):
     logger.warn('Error occured in update, "%s": %s' % (update, error))
     if notify:
+        import notify2
         notify2.Notification("Error occured in update '%s': '%s'" % (update, error))
 
 def start_bot():
+    global notify
+    
     # Initialize config
     config = configurator.Configurator()
     generalconfig = config.parse_general()

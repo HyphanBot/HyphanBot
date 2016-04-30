@@ -43,12 +43,12 @@ def get_wordlist(url, filename="shiritori_wordlist.txt"):
             logger.info("Wordlist for shiritori not found; downloading new list. This can take a while...")
             r = requests.get(url, stream=True)
             filesize = len(r.content)
-                with open(filename, 'wb') as filehandle:
-                    content_progress = tqdm(r.iter_content(), total=filesize)
-                        for chunk in content_progress:
-                            content_progress.set_description("Downloading wordlist")
-                            filehandle.write(chunk) # Download them words
-                            logger.info("New wordlist saved to 'shiritori/%s'" % filename)
+            with open(filename, 'wb') as filehandle:
+                content_progress = tqdm(r.iter_content(), total=filesize)
+                for chunk in content_progress:
+                        content_progress.set_description("Downloading wordlist")
+                        filehandle.write(chunk) # Download them words
+                        logger.info("New wordlist saved to 'shiritori/%s'" % filename)
         with open(filename, 'r') as filehandle:
             wordlist = [word.strip().lower() for word in filehandle] # Make them words go naked and bend over
             wordlist = list(filter(lambda x: "'s" not in x, wordlist)) # Filter out all them damned 's

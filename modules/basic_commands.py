@@ -20,23 +20,28 @@ This mod provides the basic commands that display possible information about the
 from telegram import ParseMode
 
 class Commands(object):
+    """Define the program logic for the module"""
     def help_cmd(self, bot, update, args):
-        bot.sendMessage(chat_id=update.message.chat_id, text=api.get_help(args),
+        """Return the a help message for the command in ARGS"""
+        bot.sendMessage(chat_id=update.message.chat_id, text=API.get_help(args),
                         parse_mode=ParseMode.MARKDOWN)
 
     def about(self, bot, update):
+        """Return an about me message"""
         # TODO: Get text and other settings from config
         bot.sendMessage(chat_id=update.message.chat_id,
                         text="I am King %s, ruler of the northern part of the galaxy."
                         % bot.getMe().first_name)
 
     def anti_nick(self, bot, update):
+        """Fix a common mistake Nick makes.."""
         msg = update.message.text.lower()
 
         if msg[len(msg) - 2:] == ".." and msg[len(msg) - 3:] != "...":
             bot.sendMessage(chat_id=update.message.chat_id, text="Three dots, Nick.")
 
     def noslash(self, bot, update, args):
+        """Run a commands based on a string or word instead of a command"""
         msg = update.message.text
         if msg == "help":
             self.help_cmd(bot, update, args)
@@ -44,24 +49,30 @@ class Commands(object):
             self.about(bot, update)
 
 class Dispatch(object):
+    """Bind the commands"""
     def __init__(self, api, updater):
-        self.define_commands(updater)
-        self.define_help(api)
-        self.set_api(api)
+        self.api = api
+        self.updater = updater
+        self.define_commands()
+        self.define_help()
+        self.set_api()
 
-    def set_api(self, temp):
-        global api
-        api = temp
+    def set_api(self):
+        """Set the api for use in the logic"""
+        global API
+        API = self.api
 
-    def define_commands(self, updater):
-        dp = updater.dispatcher
-        c = Commands()
+    def define_commands(self):
+        """Bind the commands"""
+        dispr = self.updater.dispatcher
+        cods = Commands()
 
-        dp.addTelegramCommandHandler("help", c.help_cmd)
-        dp.addTelegramCommandHandler("about", c.about)
-        dp.addTelegramMessageHandler(c.noslash)
-        dp.addTelegramMessageHandler(c.anti_nick)
+        dispr.addTelegramCommandHandler("help", cods.help_cmd)
+        dispr.addTelegramCommandHandler("about", cods.about)
+        dispr.addTelegramMessageHandler(cods.noslash)
+        dispr.addTelegramMessageHandler(cods.anti_nick)
 
-    def define_help(self, api):
-        api.set_help("help", "Gets help for a specified command:\n/help [command name]")
-        api.set_help("about", "A message of our great leader:\n/about")
+    def define_help(self):
+        """Define the help messages"""
+        self.api.set_help("help", "Gets help for a specified command:\n/help [command name]")
+        self.api.set_help("about", "A message of our great leader:\n/about")

@@ -47,7 +47,7 @@ class Configurator:
         logger = self.logger
         config = SafeConfigParser()
 
-        # Look in the CONFIG_PATHS for the config file
+        # Look in the CONFIG_PAT''HS for the config file
         for cfile in CONFIG_PATHS:
             if pathlib.Path(cfile).exists():
                 logger.info("Configuration file has been found at: " + cfile)
