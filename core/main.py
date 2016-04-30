@@ -53,8 +53,10 @@ mainlog.addFilter(Filter())
 
 def error(bot, update, error):
     logger.warn('Error occured in update, "%s": %s' % (update, error))
-    if notify:
+    try:
         notify2.Notification("Error occured in update '%s': '%s'" % (update, error))
+    except:
+        pass # Who cares?
 
 def start_bot():
     # Initialize config
@@ -81,13 +83,12 @@ def start_bot():
         notify2.Notification("Initialized {}".format(getBot.first_name),
                              "{} has started".format(getBot.username),
                              "notification-message-im").show()
-        notify = True
     except ImportError:
         logger.warning("Unable to import 'notify2' module")
-
     except:
         logger.error("X11 or Dbus isn't running")
-        logger.info("Initialized %s (%s)." % (getBot.first_name, getBot.username))
+
+    logger.info("Initialized %s (%s)." % (getBot.first_name, getBot.username))
 
     updater.idle()
 
