@@ -25,6 +25,8 @@ The following code and comments describes the basic structure of how
 command mods work.
 '''
 
+from telegram.ext import CommandHandler, Filters
+
 # Create a class where you can define the commands
 class Commands(object):
     """Define the program logic of the module. Only used as a namespace to enforce a, slightly,
@@ -56,15 +58,21 @@ class Commands(object):
         if msg == "stupid bot" or msg == "stupid bot!" or msg == "stupid bot.":
             bot.sendMessage(chat_id=update.message.chat_id, text="Stupid human.")
 
-    def noslash(self, bot, update, args):
+    def noslash(self, bot, update):
         """Bind the commands using words or sentences instead of purely commands"""
         # get the message
         msg = update.message.text.lower()
+        args = msg.split(" ")
 
         if msg == "hello":
             self.hello(bot, update)
         elif msg.startswith("goodbye"):
-            self.goodbye(bot, update, args)
+            self.goodbye(bot, update, args[1])
+
+    def handle_msgs(self, bot, update):
+        """Handle messages"""
+        self.noslash(bot, update)
+        self.stupid(bot, update)
 
 # Dispatch class. This is the core of every mod.
 # This is what Hyphan calls to initialize the mod.
@@ -105,16 +113,15 @@ class Dispatch(object):
 
         # This listens for the command "/goodbye" and calls the goodbye() function if the
         # command is executed
-        dispr.addTelegramCommandHandler("goodbye", commands.goodbye)
+        dispr.addHandler(CommandHandler("goodbye", commands.goodbye, pass_args=True))
 
         # You can also handle the same functionaltiy for multiple commands:
-        dispr.addTelegramCommandHandler("hello", commands.hello)
-        dispr.addTelegramCommandHandler("morning", commands.hello)
-        dispr.addTelegramCommandHandler("hi", commands.hello)
+        dispr.addHandler(CommandHandler("hello", commands.hello))
+        dispr.addHandler(CommandHandler("morning", commands.hello))
+        dispr.addHandler(CommandHandler("hi", commands.hello))
 
-        # A command that will execute will no slash
-        dispr.addTelegramMessageHandler(commands.stupid)
-        dispr.addTelegramMessageHandler(commands.noslash)
+        # A command that will execute with no slash
+        self.api.add_message_handler([Filters.text], commands.handle_msgs)
 
     # Assigns help messages to the commands
     def define_help(self):

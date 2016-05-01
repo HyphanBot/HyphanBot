@@ -23,6 +23,7 @@ import time
 
 import requests
 from telegram import ParseMode
+from telegram.ext import CommandHandler, Filters
 #from tdqm import tdqm # Progress bar module. Install: pip install tqdm
 
 '''
@@ -247,8 +248,8 @@ class Dispatch(object):
         dp = updater.dispatcher
 
         shiritori_game = Shiritori(mod)
-        dp.addTelegramCommandHandler("shiritori", shiritori_game.start_game)
-        dp.addTelegramCommandHandler("wordchain", shiritori_game.start_game)
-        dp.addTelegramMessageHandler(shiritori_game.shiritori)
+        dp.addHandler(CommandHandler("shiritori", shiritori_game.start_game, pass_args=True))
+        dp.addHandler(CommandHandler("wordchain", shiritori_game.start_game, pass_args=True))
+        mod.add_message_handler([Filters.text], shiritori_game.shiritori)
 
         mod.set_help("shiritori", shiritori_game.helptext)

@@ -18,6 +18,8 @@ https://www.gnu.org/licenses/agpl-3.0.html>.
 import main
 import logging
 
+from telegram.ext import MessageHandler
+
 """
 This module contains the HyphanAPI class which intends to provide api
 for Hyphan's mods.
@@ -75,7 +77,8 @@ class HyphanAPI:
                 api  (HyphanAPI): The base api object the mod will use.
                 name (string): The name of the mod.
         """
-        def __init__(self, api, name):
+        def __init__(self, mod_id, api, name):
+            self.mod_id = mod_id
             self.api = api
             self.name = name
             self.logger = logging.getLogger(__name__)
@@ -139,3 +142,13 @@ class HyphanAPI:
                 return self.api.helptext[module]
             else:
                 return "Help isn't coming..."
+
+        def add_message_handler(self, filters, handler, pass_update_queue=False):
+            """
+            Workaround for MessageHandler's grouping issue present in the 4.0 update
+            of the python-telegram-bot library.
+            This method, however, may only be used once per mod as each mod would
+            belong to only one group and only one MessageHandler runs per group.
+            """
+            return self.api.updater.dispatcher.addHandler(
+                MessageHandler(filters, handler, pass_update_queue), group=self.mod_id)

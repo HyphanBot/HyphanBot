@@ -15,6 +15,7 @@ License along with Hyphan.  If not, see
 https://www.gnu.org/licenses/agpl-3.0.html>.
 '''
 import eveapi
+from telegram.ext import CommandHandler
 
 class Commands(object):
     """The logic of the hyphan commands"""
@@ -105,10 +106,10 @@ class Dispatch(object):
         dispr = self.updater.dispatcher
         cods = Commands()
 
-        dispr.addTelegramCommandHandler("evealliance", cods.getalliances)
-        dispr.addTelegramCommandHandler("evechar", cods.characters)
-        dispr.addTelegramCommandHandler("evecharacters", cods.characters)
-        dispr.addTelegramCommandHandler("evewallet", cods.balance)
+        dispr.addHandler(CommandHandler("evealliance", cods.getalliances))
+        dispr.addHandler(CommandHandler("evechar", cods.characters))
+        dispr.addHandler(CommandHandler("evecharacters", cods.characters))
+        dispr.addHandler(CommandHandler("evewallet", cods.balance, pass_args=True))
 
     def define_help(self):
         """Define the help messages"""

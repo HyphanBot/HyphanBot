@@ -16,7 +16,7 @@ https://www.gnu.org/licenses/agpl-3.0.html>.
 '''
 
 import logging
-import telegram
+import telegram.ext as telegram
 
 # project specific
 import configurator

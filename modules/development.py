@@ -15,6 +15,7 @@ License along with Hyphan.  If not, see
 https://www.gnu.org/licenses/agpl-3.0.html>.
 '''
 from telegram import ParseMode
+from telegram.ext import CommandHandler
 
 def devchannel(bot, update, args):
     """Post to the Hyphan development channel"""
@@ -43,7 +44,7 @@ class Dispatch(object):
     def define_commands(self):
         """Bind the commands"""
         dispr = self.updater.dispatcher
-        dispr.addTelegramCommandHandler("devpost", devchannel)
+        dispr.addHandler(CommandHandler("devpost", devchannel, pass_args=True))
 
     def define_help(self):
         """Set the help messages"""

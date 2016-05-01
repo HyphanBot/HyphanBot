@@ -18,6 +18,7 @@ This mod provides the basic commands that display possible information about the
 '''
 
 from telegram import ParseMode
+from telegram.ext import CommandHandler, Filters
 
 class Commands(object):
     """Define the program logic for the module"""
@@ -40,13 +41,18 @@ class Commands(object):
         if msg[len(msg) - 2:] == ".." and msg[len(msg) - 3:] != "...":
             bot.sendMessage(chat_id=update.message.chat_id, text="Three dots, Nick.")
 
-    def noslash(self, bot, update, args):
+    def noslash(self, bot, update):
         """Run a commands based on a string or word instead of a command"""
         msg = update.message.text
         if msg == "help":
             self.help_cmd(bot, update, args)
         elif msg == "about":
             self.about(bot, update)
+
+    def handle_msgs(self, bot, update):
+        """Handles messages"""
+        self.noslash(bot, update)
+        self.anti_nick(bot, update)
 
 class Dispatch(object):
     """Bind the commands"""
@@ -67,10 +73,9 @@ class Dispatch(object):
         dispr = self.updater.dispatcher
         cods = Commands()
 
-        dispr.addTelegramCommandHandler("help", cods.help_cmd)
-        dispr.addTelegramCommandHandler("about", cods.about)
-        dispr.addTelegramMessageHandler(cods.noslash)
-        dispr.addTelegramMessageHandler(cods.anti_nick)
+        dispr.addHandler(CommandHandler("help", cods.help_cmd, pass_args=True))
+        dispr.addHandler(CommandHandler("about", cods.about))
+        self.api.add_message_handler([Filters.text], cods.handle_msgs)
 
     def define_help(self):
         """Define the help messages"""

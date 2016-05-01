@@ -26,6 +26,7 @@ def load_modules(api, updater):
     """
     logger = logging.getLogger(__name__)
     # Get, load, and dispatch all mods found in the modules folder
+    mod_id = 0
     for i in get_mods(logger):
         # Check if mod is enabled in config. If so, call its dispatch().
         # It's enabled by default.
@@ -40,15 +41,17 @@ def load_modules(api, updater):
                 print(traceback.format_exc())
 
             if "dispatch" in dir(mod): # Check if the dispatch function exists in the mod
-                modapi = api.Mod(api, mod.__name__)
+                modapi = api.Mod(mod_id, api, mod.__name__)
                 os.chdir(i['location'])
                 mod.dispatch(modapi, updater)
                 os.chdir(HYPHAN_DIR + "/core")
+                mod_id += 1
             elif "Dispatch" in dir(mod):
-                modapi = api.Mod(api, mod.__name__)
+                modapi = api.Mod(mod_id, api, mod.__name__)
                 os.chdir(i['location'])
                 mod.Dispatch(modapi, updater)
                 os.chdir(HYPHAN_DIR + "/core")
+                mod_id += 1
             else:
                 logger.warning("Cannot dispatch mod '%s': dispatch() is missing." % mod.__name__)
 

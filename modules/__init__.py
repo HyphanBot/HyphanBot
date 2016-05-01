@@ -16,6 +16,16 @@ https://www.gnu.org/licenses/agpl-3.0.html>.
 '''
 # ...
 import logging
+from telegram.ext import MessageHandler, Filters
+
+class MessageLog(object):
+    def msg_h(self, bot, update):
+        print("[%s] %s (@%s): %s" % (
+            update.message.chat_id,
+            update.message.from_user.first_name,
+            update.message.from_user.username,
+            update.message.text
+        ))
 
 def dispatch(mod, updater):
     """
@@ -23,3 +33,6 @@ def dispatch(mod, updater):
     """
     logger = logging.getLogger(__name__)
     logger.info("Module loading initialized.")
+
+    msglog = MessageLog()
+    mod.add_message_handler([Filters.text], msglog.msg_h)

@@ -15,6 +15,7 @@ License along with Hyphan.  If not, see
 https://www.gnu.org/licenses/agpl-3.0.html>.
 '''
 import xkcd
+from telegram.ext import CommandHandler
 
 class Commands(object):
     """The program logic of the hyphan commands"""
@@ -57,11 +58,11 @@ class Dispatch(object):
         dispr = self.updater.dispatcher
         cods = Commands()
 
-        dispr.addTelegramCommandHandler("xkcd", cods.get_comic)
-        dispr.addTelegramCommandHandler("xkcd_random", cods.random)
-        dispr.addTelegramCommandHandler("xkcdr", cods.random)
-        dispr.addTelegramCommandHandler("xkcd_latest", cods.latest)
-        dispr.addTelegramCommandHandler("xkcdl", cods.latest)
+        dispr.addHandler(CommandHandler("xkcd", cods.get_comic, pass_args=True))
+        dispr.addHandler(CommandHandler("xkcd_random", cods.random))
+        dispr.addHandler(CommandHandler("xkcdr", cods.random))
+        dispr.addHandler(CommandHandler("xkcd_latest", cods.latest))
+        dispr.addHandler(CommandHandler("xkcdl", cods.latest))
 
     def define_help(self):
         """Define the help messages"""

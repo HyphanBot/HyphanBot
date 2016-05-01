@@ -19,6 +19,8 @@ This mod operates the bot. It can quit or restart Hyphan.
 import os
 import signal
 
+from telegram.ext import CommandHandler, Filters
+
 class Commands(object):
     """Define the program logic"""
     def quit(self, bot, update):
@@ -81,8 +83,8 @@ class Dispatch(object):
         dispr = self.updater.dispatcher
         cods = Commands()
 
-        dispr.addTelegramCommandHandler("quit", cods.quit)
-        dispr.addTelegramCommandHandler("restart", cods.restart)
-        dispr.addTelegramCommandHandler("reloadconf", cods.reload_config)
-        dispr.addTelegramCommandHandler("reconf", cods.reload_config)
-        dispr.addTelegramMessageHandler(cods.noslash)
+        dispr.addHandler(CommandHandler("quit", cods.quit))
+        dispr.addHandler(CommandHandler("restart", cods.restart))
+        dispr.addHandler(CommandHandler("reloadconf", cods.reload_config))
+        dispr.addHandler(CommandHandler("reconf", cods.reload_config))
+        self.api.add_message_handler([Filters.text], cods.noslash)
