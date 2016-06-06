@@ -68,8 +68,6 @@ def get_mods(logger):
                  "path": location + "/" + main_module + ".py",
                  "main": main_module})
 
-            logger.info("Found mod '%s'." % mod_name)
-
     return mods
 
 def load_mod(mod):

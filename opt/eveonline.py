@@ -74,10 +74,10 @@ class Commands(object):
                 bot.sendMessage(chat_id=update.message.chat_id, text="{0} has {1} ISK"\
                                 .format(character.name, '{0:,}'.format(isk)))
 
-class Dispatch(object):
+class Dispatcher(object):
     """Set the metadata for the hyphan commands"""
 
-    def __init__(self, updater):
+    def __init__(self, api, updater):
         self.updater = updater
         self.set_config()
         self.define_commands()
