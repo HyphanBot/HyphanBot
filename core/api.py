@@ -35,11 +35,13 @@ class HyphanAPI:
                     used in mods.
             config  (Configurator): The configuration object that is
                     used to parse and access the configuration file.
+            inline_engine (InlineEngine): The InlineEngine object.
     """
-    def __init__(self, updater, config):
+    def __init__(self, updater, config, inline_engine):
         self.updater = updater
         self.main = main
         self.config = config
+        self.inline_engine = inline_engine
         self.helptext = {}
         self.logger = logging.getLogger(__name__)
 
@@ -74,6 +76,7 @@ class HyphanAPI:
         This class identifies the actual mod.
 
         Args:
+                mod_id (int): A unique incremented identifier of the loaded mod.
                 api  (HyphanAPI): The base api object the mod will use.
                 name (string): The name of the mod.
         """
@@ -115,8 +118,8 @@ class HyphanAPI:
             Sets and returns key data to append to the configuration file.
 
             Args:
-                data (Dictionary): Dictionary object that contains key-value data
-                    to append to the config file.
+                data (Dictionary): Dictionary object that contains key-value
+                    data to append to the config file.
             """
             return self.api.config.append(self.name, data)
 
@@ -145,10 +148,25 @@ class HyphanAPI:
 
         def add_message_handler(self, filters, handler, pass_update_queue=False):
             """
-            Workaround for MessageHandler's grouping issue present in the 4.0 update
-            of the python-telegram-bot library.
-            This method, however, may only be used once per mod as each mod would
-            belong to only one group and only one MessageHandler runs per group.
+            Workaround for MessageHandler's grouping issue present in the 4.0
+            update of the python-telegram-bot library.
+            This method, however, may only be used once per mod as each mod
+            would belong to only one group and only one MessageHandler runs per
+            group.
             """
             return self.api.updater.dispatcher.addHandler(
                 MessageHandler(filters, handler, pass_update_queue), group=self.mod_id)
+
+        def add_inline_query(self, name, callback):
+            """
+            Registers an Inline Bot feature to HyphanBot.
+
+            Args:
+                name (string): A unique identifiable name for the feature.
+                callback (function): A function that takes ``bot, update`` as
+                    positional arguments and is used to handle inline queries.
+                    It will be called whenever the user activates the feature
+                    from the Inline Bot settings.
+            """
+            if not self.api.inline_engine.is_feature(name):
+                self.api.inline_engine.add_feature(name, callback)

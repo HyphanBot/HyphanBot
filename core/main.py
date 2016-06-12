@@ -15,6 +15,7 @@ License along with Hyphan.  If not, see
 https://www.gnu.org/licenses/agpl-3.0.html>.
 '''
 
+import sys
 import logging
 import telegram.ext as telegram
 
@@ -22,9 +23,13 @@ import telegram.ext as telegram
 import configurator
 import dispatcher
 import api
+import inline_engine
+from constants import HYPHAN_DIR
 
 ## Get Hyphan's root directory from the environment variable (exported in run.sh)
 #HYPHAN_DIR = os.getenv('HYPHAN_DIR', os.path.dirname(os.getcwd()))
+
+sys.path.append(HYPHAN_DIR)
 
 # Log everything
 class Filter(logging.Filter):
@@ -70,7 +75,8 @@ def start_bot():
     updater = telegram.Updater(generalconfig['token'], workers=10)
     get_bot = updater.bot.getMe()
 
-    hyphan_api = api.HyphanAPI(updater, config)
+    inline = inline_engine.InlineEngine(updater)
+    hyphan_api = api.HyphanAPI(updater, config, inline)
 
     # Dispatch modules
     dp = updater.dispatcher
