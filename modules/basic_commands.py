@@ -73,8 +73,8 @@ class Dispatch(object):
         dispr = self.updater.dispatcher
         cods = Commands()
 
-        dispr.addHandler(CommandHandler("help", cods.help_cmd, pass_args=True))
-        dispr.addHandler(CommandHandler("about", cods.about))
+        dispr.add_handler(CommandHandler("help", cods.help_cmd, pass_args=True))
+        dispr.add_handler(CommandHandler("about", cods.about))
         self.api.add_message_handler([Filters.text], cods.handle_msgs)
 
     def define_help(self):

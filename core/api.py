@@ -154,7 +154,7 @@ class HyphanAPI:
             would belong to only one group and only one MessageHandler runs per
             group.
             """
-            return self.api.updater.dispatcher.addHandler(
+            return self.api.updater.dispatcher.add_handler(
                 MessageHandler(filters, handler, pass_update_queue), group=self.mod_id)
 
         def add_inline_query(self, name, callback):

@@ -106,10 +106,10 @@ class Dispatcher(object):
         dispr = self.updater.dispatcher
         cods = Commands()
 
-        dispr.addHandler(CommandHandler("evealliance", cods.getalliances))
-        dispr.addHandler(CommandHandler("evechar", cods.characters))
-        dispr.addHandler(CommandHandler("evecharacters", cods.characters))
-        dispr.addHandler(CommandHandler("evewallet", cods.balance, pass_args=True))
+        dispr.add_handler(CommandHandler("evealliance", cods.getalliances))
+        dispr.add_handler(CommandHandler("evechar", cods.characters))
+        dispr.add_handler(CommandHandler("evecharacters", cods.characters))
+        dispr.add_handler(CommandHandler("evewallet", cods.balance, pass_args=True))
 
     def define_help(self):
         """Define the help messages"""

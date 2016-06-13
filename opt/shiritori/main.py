@@ -248,8 +248,8 @@ class Dispatch(object):
         dp = updater.dispatcher
 
         shiritori_game = Shiritori(mod)
-        dp.addHandler(CommandHandler("shiritori", shiritori_game.start_game, pass_args=True))
-        dp.addHandler(CommandHandler("wordchain", shiritori_game.start_game, pass_args=True))
+        dp.add_handler(CommandHandler("shiritori", shiritori_game.start_game, pass_args=True))
+        dp.add_handler(CommandHandler("wordchain", shiritori_game.start_game, pass_args=True))
         mod.add_message_handler([Filters.text], shiritori_game.shiritori)
 
         mod.set_help("shiritori", shiritori_game.helptext)

@@ -83,8 +83,8 @@ class Dispatch(object):
         dispr = self.updater.dispatcher
         cods = Commands()
 
-        dispr.addHandler(CommandHandler("quit", cods.quit))
-        dispr.addHandler(CommandHandler("restart", cods.restart))
-        dispr.addHandler(CommandHandler("reloadconf", cods.reload_config))
-        dispr.addHandler(CommandHandler("reconf", cods.reload_config))
+        dispr.add_handler(CommandHandler("quit", cods.quit))
+        dispr.add_handler(CommandHandler("restart", cods.restart))
+        dispr.add_handler(CommandHandler("reloadconf", cods.reload_config))
+        dispr.add_handler(CommandHandler("reconf", cods.reload_config))
         self.api.add_message_handler([Filters.text], cods.noslash)

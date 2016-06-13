@@ -58,11 +58,11 @@ class Dispatch(object):
         dispr = self.updater.dispatcher
         cods = Commands()
 
-        dispr.addHandler(CommandHandler("xkcd", cods.get_comic, pass_args=True))
-        dispr.addHandler(CommandHandler("xkcd_random", cods.random))
-        dispr.addHandler(CommandHandler("xkcdr", cods.random))
-        dispr.addHandler(CommandHandler("xkcd_latest", cods.latest))
-        dispr.addHandler(CommandHandler("xkcdl", cods.latest))
+        dispr.add_handler(CommandHandler("xkcd", cods.get_comic, pass_args=True))
+        dispr.add_handler(CommandHandler("xkcd_random", cods.random))
+        dispr.add_handler(CommandHandler("xkcdr", cods.random))
+        dispr.add_handler(CommandHandler("xkcd_latest", cods.latest))
+        dispr.add_handler(CommandHandler("xkcdl", cods.latest))
 
     def define_help(self):
         """Define the help messages"""

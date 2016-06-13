@@ -148,7 +148,7 @@ class Dispatch(object):
         if ENABLED:
             feeder = Feeder()
             dispr = updater.dispatcher
-            dispr.addHandler(CommandHandler("feed", feeder.cmd_handle, pass_args=True))
+            dispr.add_handler(CommandHandler("feed", feeder.cmd_handle, pass_args=True))
             api.set_help("feed", """`/feed` command *[WORK IN PROGRESS]*
             Reads RSS and Atom feeds and can notify on new updates.
             `/feed add` - Adds a new feed for the current chat

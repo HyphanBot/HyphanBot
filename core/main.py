@@ -81,7 +81,7 @@ def start_bot():
     # Dispatch modules
     dp = updater.dispatcher
     dispatcher.load_modules(hyphan_api, updater)
-    dp.addErrorHandler(error)
+    dp.add_error_handler(error)
 
     # Start the bot
     updater.start_polling()

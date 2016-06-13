@@ -44,7 +44,7 @@ class Dispatch(object):
     def define_commands(self):
         """Bind the commands"""
         dispr = self.updater.dispatcher
-        dispr.addHandler(CommandHandler("devpost", devchannel, pass_args=True))
+        dispr.add_handler(CommandHandler("devpost", devchannel, pass_args=True))
 
     def define_help(self):
         """Set the help messages"""

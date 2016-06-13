@@ -113,12 +113,12 @@ class Dispatch(object):
 
         # This listens for the command "/goodbye" and calls the goodbye() function if the
         # command is executed
-        dispr.addHandler(CommandHandler("goodbye", commands.goodbye, pass_args=True))
+        dispr.add_handler(CommandHandler("goodbye", commands.goodbye, pass_args=True))
 
         # You can also handle the same functionaltiy for multiple commands:
-        dispr.addHandler(CommandHandler("hello", commands.hello))
-        dispr.addHandler(CommandHandler("morning", commands.hello))
-        dispr.addHandler(CommandHandler("hi", commands.hello))
+        dispr.add_handler(CommandHandler("hello", commands.hello))
+        dispr.add_handler(CommandHandler("morning", commands.hello))
+        dispr.add_handler(CommandHandler("hi", commands.hello))
 
         # A command that will execute with no slash
         self.api.add_message_handler([Filters.text], commands.handle_msgs)

@@ -101,4 +101,4 @@ class Dispatch(object):
         """Bind the commands to the functions"""
         dispr = self.updater.dispatcher
         cods = Commands()
-        dispr.addHandler(CommandHandler("booru", cods.random_post, pass_args=True))
+        dispr.add_handler(CommandHandler("booru", cods.random_post, pass_args=True))
