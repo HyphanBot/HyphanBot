@@ -5,15 +5,7 @@ import time
 
 from telegram.ext import CommandHandler
 from telegram import ParseMode
-
-try:
-    import feedparser
-except:
-    LOGGER = logging.getLogger(__name__)
-    LOGGER.error("Cannot load this module because of an error while trying to import feedparser")
-    ENABLED = False
-
-ENABLED = True
+import feedparser
 
 class Feeder(object):
     """docstring for Feeder"""
@@ -145,15 +137,14 @@ class Feeder(object):
 class Dispatch(object):
     """docstring for Dispatch"""
     def __init__(self, api, updater):
-        if ENABLED:
-            feeder = Feeder()
-            dispr = updater.dispatcher
-            dispr.add_handler(CommandHandler("feed", feeder.cmd_handle, pass_args=True))
-            api.set_help("feed", """`/feed` command *[WORK IN PROGRESS]*
-            Reads RSS and Atom feeds and can notify on new updates.
-            `/feed add` - Adds a new feed for the current chat
-            `/feed remove` - Removes a feed for the current chat
-            `/feed list` - Lists feeds
-            `/feed notify on` - Enables notifications for current chat
-            `/feed notify off` - Disables notification for current chat
-            """)
+        feeder = Feeder()
+        dispr = updater.dispatcher
+        dispr.add_handler(CommandHandler("feed", feeder.cmd_handle, pass_args=True))
+        api.set_help("feed", """`/feed` command *[WORK IN PROGRESS]*
+        Reads RSS and Atom feeds and can notify on new updates.
+        `/feed add` - Adds a new feed for the current chat
+        `/feed remove` - Removes a feed for the current chat
+        `/feed list` - Lists feeds
+        `/feed notify on` - Enables notifications for current chat
+        `/feed notify off` - Disables notification for current chat
+        """)

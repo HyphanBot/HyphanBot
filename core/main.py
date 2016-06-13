@@ -17,6 +17,7 @@ https://www.gnu.org/licenses/agpl-3.0.html>.
 
 import sys
 import logging
+import argparse
 import telegram.ext as telegram
 
 # project specific
@@ -25,10 +26,6 @@ import dispatcher
 import api
 import inline_engine
 from constants import HYPHAN_DIR
-
-## Get Hyphan's root directory from the environment variable (exported in run.sh)
-#HYPHAN_DIR = os.getenv('HYPHAN_DIR', os.path.dirname(os.getcwd()))
-
 sys.path.append(HYPHAN_DIR)
 
 # Log everything
@@ -47,7 +44,7 @@ class Filter(logging.Filter):
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s [%(levelname)s]: %(message)s',
-    level=logging.INFO) # change this to logging.INFO to enable verbose mode
+    level=logging.INFO) # change this to logging.DEBUG to enable verbose mode
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +63,7 @@ def error(bot, update, error):
         # Go along as if nothing ever happened...
         pass
 
-def start_bot():
+def start_bot(tracestack=False):
     """ HyphanBot's entry point ('__main__' function call) """
     # Initialize config
     config = configurator.Configurator()
@@ -80,7 +77,7 @@ def start_bot():
 
     # Dispatch modules
     dp = updater.dispatcher
-    dispatcher.load_modules(hyphan_api, updater)
+    dispatcher.load_modules(hyphan_api, updater, tracestack)
     dp.add_error_handler(error)
 
     # Start the bot
@@ -103,4 +100,13 @@ def start_bot():
     updater.idle()
 
 if __name__ == '__main__':
-    start_bot()
+    tracestack = False
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--trace", help="Prints stacktraces to handled errors.",
+                        action="store_true")
+    args = parser.parse_args()
+    if args.trace:
+        print("Trace is on")
+        tracestack = True
+
+    start_bot(tracestack)

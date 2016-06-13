@@ -10,4 +10,4 @@ function getAbsPath() {(
 
 # HyphanBot's root directory should be this script's parent directory
 export HYPHAN_DIR=$(dirname $(getAbsPath $0))
-python3 "$HYPHAN_DIR/core/main.py"
+python3 "$HYPHAN_DIR/core/main.py" "$@"

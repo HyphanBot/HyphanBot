@@ -20,7 +20,7 @@ from modloader import *
 import logging
 import traceback
 
-def load_modules(api, updater):
+def load_modules(api, updater, tracestack=False):
     """
     Loads and runs HyphanBot's mods.
     """
@@ -36,9 +36,14 @@ def load_modules(api, updater):
             try:
                 mod = load_mod(i) # Load the mod
                 logger.info("Mod %s has been loaded." % i['name'])
+            except ImportError as e:
+                logger.error("ImportError in mod '%s': %s" % (i['name'], str(e)))
+                if tracestack:
+                    print(traceback.format_exc())
             except:
                 logger.error("Cannot load mod %s." % i['name'])
-                print(traceback.format_exc())
+                if tracestack:
+                    print(traceback.format_exc())
 
             if "dispatch" in dir(mod): # Check if the dispatch function exists in the mod
                 modapi = api.Mod(mod_id, api, mod.__name__)

@@ -25,13 +25,8 @@ import logging
 import random
 
 from telegram.ext import CommandHandler, Filters
-
-try:
-    from pybooru import Pybooru
-    import pyshorteners
-except ImportError:
-    LOGGER = logging.getLogger(__name__)
-    LOGGER.info("Cannot load this module since one or multiple modules cannot be imported.")
+from pybooru import Pybooru
+import pyshorteners
 
 class Commands(object):
     """Define the program logic of the module"""
@@ -102,3 +97,5 @@ class Dispatch(object):
         dispr = self.updater.dispatcher
         cods = Commands()
         dispr.add_handler(CommandHandler("booru", cods.random_post, pass_args=True))
+
+        # TODO: Make an Inline Bot feature for this mod.
