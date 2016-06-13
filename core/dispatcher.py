@@ -45,20 +45,16 @@ def load_modules(api, updater, tracestack=False):
                 if tracestack:
                     print(traceback.format_exc())
 
-            if "dispatch" in dir(mod): # Check if the dispatch function exists in the mod
+            # Check if the dispatch function or object exists in the mod
+            if "dispatch" in dir(mod) or "Dispatch" in dir(mod):
                 modapi = api.Mod(mod_id, api, mod.__name__)
-                os.chdir(i['location'])
-                mod.dispatch(modapi, updater)
-                os.chdir(HYPHAN_DIR + "/core")
-                mod_id += 1
-            elif "Dispatch" in dir(mod):
-                modapi = api.Mod(mod_id, api, mod.__name__)
-                os.chdir(i['location'])
-                mod.Dispatch(modapi, updater)
-                os.chdir(HYPHAN_DIR + "/core")
+                try:
+                    mod.dispatch(modapi, updater) if "dispatch" in dir(mod) else mod.Dispatch(modapi, updater)
+                except Exception as e:
+                    logger.error("Error in mod '%s': %s" % (i['name'], str(e)))
                 mod_id += 1
             else:
-                logger.warning("Cannot dispatch mod '%s': dispatch() is missing." % mod.__name__)
+                logger.warning("Unable to dispatch mod '%s': dispatch() is missing." % mod.__name__)
 
         else:
             logger.warning("Mod %s is disabled." % i['name'])

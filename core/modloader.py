@@ -20,7 +20,10 @@ from os.path import expanduser
 from constants import HYPHAN_DIR
 
 import os
+import sys
 import pathlib
+
+from pprint import pprint
 
 def get_mods(logger):
     """
@@ -62,11 +65,12 @@ def get_mods(logger):
             elif not main_module + ".py" in os.listdir(location):
                 logger.warning("Not loading mod '%s': '%s.py' not found." % (mod, main_module))
 
-            mods.append(
-                {"name": mod_name,
-                 "location": location,
-                 "path": location + "/" + main_module + ".py",
-                 "main": main_module})
+            if not any(m["name"] == mod_name for m in mods):
+                mods.append(
+                    {"name": mod_name,
+                     "location": location,
+                     "path": location + "/" + main_module + ".py",
+                     "main": main_module})
 
     return mods
 

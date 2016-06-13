@@ -102,7 +102,7 @@ class HyphanAPI:
                     in the config file.
             """
             if self.name not in self.api.config.get_sections():
-                self.logger.warning("Missing config section for mod '%s'" % self.name)
+                #self.logger.warning("Missing config section for mod '%s'" % self.name)
                 if key != None:
                     return self.api.config.access(self.name, key, fallback)
                 else:
