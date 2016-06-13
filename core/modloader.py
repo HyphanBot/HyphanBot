@@ -20,10 +20,7 @@ from os.path import expanduser
 from constants import HYPHAN_DIR
 
 import os
-import sys
 import pathlib
-
-from pprint import pprint
 
 def get_mods(logger):
     """
