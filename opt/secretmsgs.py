@@ -23,7 +23,7 @@ from telegram.ext import CommandHandler
 
 class SecretMsgs(object):
     """
-    Encodes/Decodes messages by decrementng/incrementing the ASCII code of each
+    Encodes/Decodes messages by incrementng/decrementing the ASCII code of each
     character in the message respectively.
 
     Args:
@@ -51,16 +51,30 @@ class SecretMsgs(object):
         ]
         self.inline_engine.show_results(update.inline_query.id, results)
 
+    def encode_cmd(self, bot, update, args):
+        msg = ' '.join(args)
+        bot.sendMessage(chat_id=update.message.chat_id, text=self.encode_msg(msg))
+
+    def decode_cmd(self, bot, update, args):
+        msg = ' '.join(args)
+        bot.sendMessage(chat_id=update.message.chat_id, text=self.decode_msg(msg))
+
     def encode_msg(self, msg):
         newstr = ""
         for code in msg.encode('ascii'):
-            newstr += chr(code-1)
+            if chr(code) == " ":
+                newstr += " "
+                continue
+            newstr += chr(code+1)
         return newstr
 
     def decode_msg(self, msg):
         newstr = ""
         for code in msg.encode('ascii'):
-            newstr += chr(code+1)
+            if chr(code) == " ":
+                newstr += " "
+                continue
+            newstr += chr(code-1)
         return newstr
 
 class Dispatch(object):
@@ -81,6 +95,7 @@ class Dispatch(object):
         smsgs = SecretMsgs(self.inline_engine)
 
         disp = self.updater.dispatcher
-        # TODO: Add traditional command processing
+        disp.add_handler(CommandHandler("smsgs_encode", smsgs.encode_cmd, pass_args=True))
+        disp.add_handler(CommandHandler("smsgs_decode", smsgs.decode_cmd, pass_args=True))
 
         mod.add_inline_query("Secret Messages", smsgs.inline_handle)
