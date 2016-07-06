@@ -12,13 +12,27 @@
   </head>
   <body>
     <div class="container">
-			<h1>HyphanBot <small>Expandable Telegram Bot</small></h1>
-			<p>HyphanBot is an expandable <a href="https://telegram.org">Telegram</a> bot coded in Python. The original perpose of this bot was to test the abilities of Telegram's Bot API.</p>
-      <p>This bot is still under development, but you can get it <a href="https://gitlab.com/NerdyBuzz/HyphanBot">here</a>.</p>
-			<footer>
-				<hr>
-				<p><small>Copyright &copy; Techisized (Buzzbyte Development) 2016</small></p>
-			</footer>
-		</div>
+		<h1>HyphanBot <small>Expandable Telegram Bot</small></h1>
+		<p>HyphanBot is an expandable <a href="https://telegram.org">Telegram</a> bot coded in Python. The original perpose of this bot was to test the abilities of Telegram's Bot API.</p>
+		<p>This bot is still under development, but you can get it <a href="https://gitlab.com/NerdyBuzz/HyphanBot">here</a>.</p>
+		<p id="version-text"></p>
+		<footer>
+			<hr>
+			<p><small>Copyright &copy; Techisized (Buzzbyte Development) 2016</small></p>
+		</footer>
+	</div>
+	<script>
+	function loadDoc() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (xhttp.readyState == 4 && xhttp.status == 200) {
+                document.getElementById("version-text").innerHTML = "HyphanBot is currently on version " + xhttp.responseText + ".";
+            }
+        };
+        xhttp.open("GET", "https://raweverything.jself.io/NerdyBuzz/HyphanBot/raw/develop/version.txt", true);
+        xhttp.send();
+    }
+    window.onload = loadDoc;
+    </script>
   </body>
 </html>
