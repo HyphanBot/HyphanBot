@@ -6,6 +6,16 @@ Telegram's Bot API and test its capabilities. HyphanBot is currently under
 development and will be publically available as soon as we have a good, stable
 Hyphan.
 
+---
+
+Docs: *Coming soon...*
+
+Website: <https://hyphanbot.techisized.com>
+
+IRC: <https://irc.techisized.com/#hyphanbot>
+
+---
+
 Installation/Setup
 -------------------
 Currently, we have no installation script available for HyphanBot, *yet*.
