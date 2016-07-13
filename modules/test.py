@@ -27,8 +27,12 @@ command mods work.
 
 from telegram.ext import CommandHandler, Filters
 
+
 # Create a class where you can define the commands
 class Commands(object):
+    def __init__(self, api):
+        self.api = api
+
     """Define the program logic of the module. Only used as a namespace to enforce a, slightly,
     more sensible layout for the program"""
     # Function that defines your mod. This will be called when the command
@@ -36,7 +40,15 @@ class Commands(object):
     # In this example, the message will be provided from the configuration file.
     def hello(self, bot, update):
         """Return the string that is defined in the configuration file"""
-        bot.sendMessage(chat_id=update.message.chat_id, text="{}".format(API.get_config("message")))
+        # try to get a value from the configuration file
+        try:
+            bot.sendMessage(chat_id=update.message.chat_id,
+                            text="{}".format(self.api.get_value("message", __name__)))
+        # Send a message if there is an error.
+        except:
+            bot.sendMessage(chat_id=update.message.chat_id,
+                            text="DOES NOT COMPUTE!")
+
 
     # A mod can also dispatch more than one command.
     # The following is an example of a function that gets called when another
@@ -44,7 +56,7 @@ class Commands(object):
     def goodbye(self, bot, update, args):
         """Return the string Goodbye ARGS!"""
         if len(args) != 0:
-            bot.sendMessage(chat_id=update.message.chat_id, text="Goodbye {}!" \
+            bot.sendMessage(chat_id=update.message.chat_id, text="Goodbye {}!"
                             .format(' '.join(args)))
         else:
             bot.sendMessage(chat_id=update.message.chat_id, text="Goodbye!")
@@ -77,31 +89,30 @@ class Commands(object):
 # Dispatch class. This is the core of every mod.
 # This is what Hyphan calls to initialize the mod.
 class Dispatch(object):
-    """Deals with the various metadata that Hyphan requires including help messages and the like"""
+    """Deals with the various metadata that Hyphan requires including help
+    messages and the like"""
     # run definitions on launch
     def __init__(self, api, updater):
-        global API
-        API = api
-
         self.api = api
         self.updater = updater
-        self.set_config()
+        #self.set_config()
         self.define_help()
         self.define_commands()
 
     ## Dispatching! ##
+    ## TODO FIX!    ##
     # Check and set the config with default keys.
     # This will be under your mod's section (identified by your mod's filename
-    # (without the extention), in this case 'test')
-    def set_config(self):
-        """Set the configuration values if they do not exist yet"""
-        if not self.api.get_config():
-            default_keys = {
-                "enabled": "yes",
-                "message": "Hello!"
-            }
-            self.api.set_config(default_keys)
-
+    # (without the extention), in this case 'test') 
+    # def set_config(self):
+    #     """Set the configuration values if they do not exist yet"""
+    #     if not self.api.get_config():
+    #         default_keys = {
+    #             "enabled": "yes",
+    #             "message": "Hello!"
+    #         }
+    #         self.api.set_config(default_keys)
+    #
     # Assign commands to the defs
     def define_commands(self):
         """Bind the commands to the functions"""
@@ -109,7 +120,7 @@ class Dispatch(object):
         dispr = self.updater.dispatcher
 
         # Get the commands
-        commands = Commands()
+        commands = Commands(self.api)
 
         # This listens for the command "/goodbye" and calls the goodbye() function if the
         # command is executed

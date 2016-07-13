@@ -31,8 +31,8 @@ Hyphan experiment: Shiritori/Word_Chain game module
 
 TODO: Implement score system based on https://shiritorigame.com
         - Optional: Subtract the remaining time from the score in each turn (Speed bonus)
-    - Optional: Create an /opt/ dir for modules like this.
 '''
+
 
 class Shiritori(object):
     """
@@ -41,9 +41,18 @@ class Shiritori(object):
     Args:
         mod (core.HyphanAPI.Mod): Mod's local API
     """
-    def __init__(self, mod):
-        self.logger = logging.getLogger(__name__)
+    def _config_or_fallback(self, item, fallback):
+        try:
+            return self.api.get_value(item, __name__)
+        except TypeError:
+            raise
+        except KeyError:
+            return fallback
 
+    def __init__(self, api):
+        self.logger = logging.getLogger(__name__)
+        self.api = api
+        
         self.helptext = """
 *Shiritori*, also known as *Word Chain*, is a game in which the players say a word that begins with the last letter of the previous word.
 _Shiritori_ originated in Japan. The word "Shiritori" literally means "taking the end" according to [Wikipedia](https://en.wikipedia.org/wiki/Shiritori) (See also: [Word Chain](https://en.wikipedia.org/wiki/Word_chain)).
@@ -54,27 +63,31 @@ To start a match with me, type:
 """
 
         # The constant time limit for each turn in seconds (default: 30)
-        self.limit = mod.get_config("timelimit", 30)
-        self.timer = self.limit # Remaining time in seconds
+        self.limit = self._config_or_fallback("timelimit", 30)
+        self.timer = self.limit  # Remaining time in seconds
 
         # The score at the beginning of the game (default: 100)
-        self.startscore = mod.get_config("startscore", 100)
-        self.score = self.startscore # The user's score
-        self.pc_score = self.startscore # Hyphan's score
+        self.startscore = self._config_or_fallback("startscore", 100)
+        self.score = self.startscore  # The user's score
+        self.pc_score = self.startscore  # Hyphan's score
 
         # The minimum number of characters allowed (default: 3)
-        self.minlen = mod.get_config("minimumlength", 3)
+        self.minlen = self._config_or_fallback("minimumlength", 3)
 
         # Message if user wins (default: "Senpai, tell me your secrets!")
-        self.winmsg = mod.get_config("winmessage", "Senpai, tell me your secrets!")
+        self.winmsg = self._config_or_fallback("winmessage",
+                                               "Senpai, tell me your secrets!")
 
         # Message if user loses (default: "This was so predictable, hehe.")
-        self.losemsg = mod.get_config("losemessage", "This was so predictable, hehe.")
+        self.losemsg = self._config_or_fallback("losemessage",
+                                                "This was so predictable, hehe.")
 
         # Gets and downloads the wordlist if not already downloaded
         self.wordlist = self.get_wordlist(
-            mod.get_config("wlurl", "https://techisized.com/hyphanbot/SCOWL-wl/words.txt"),
-            mod.get_config("wlsavename", "shiritori_wordlist.txt"))
+            self._config_or_fallback("wlurl",
+                                     "https://techisized.com/hyphanbot/SCOWL-wl/words.txt"),
+            self._config_or_fallback("wlsavename",
+                                     "shiritori_wordlist.txt"))
 
         self.started = False
         self.lastword = None

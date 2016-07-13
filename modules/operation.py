@@ -23,20 +23,41 @@ from telegram.ext import CommandHandler, Filters
 
 class Commands(object):
     """Define the program logic"""
+    def __init__(self, hyphan_api):
+        """Define the program logic
+
+        :param hyphan_api: Hyphan's api
+        """
+        self.hyphan_api = hyphan_api
+
+    def _sender_is_admin(self, update):
+        try:
+            return self.hyphan_api.in_config(update.message.from_user['username'],
+                                             "admins", "general")
+        except TypeError:
+            raise
+        except KeyError:
+            return False
+
     def quit(self, bot, update):
         """Quit hyphan"""
-        if API.api.is_sender_admin(update): # Use the API to check if sender is admin
-            bot.sendMessage(chat_id=update.message.chat_id, text="Goodbye!")
+        # Use the API to check if sender is admin
+        self.logger.info("Called /quit")
+
+        if self._sender_is_admin(update):
+            bot.sendMessage(chat_id=update.message.chat_id,
+                            text="Affermative, %s. I read you."
+                            % update.message.from_user.first_name)
             os.kill(os.getpid(), signal.SIGTERM)
         else:
             bot.sendMessage(chat_id=update.message.chat_id,
-                            text="Sorry, %s, I'm afraid I can't let you do that."
+                            text="I'm sorry, %s, I'm afraid I can't do that."
                             % update.message.from_user.first_name)
 
     def restart(self, bot, update):
         """Restart the bot if it's run using run.sh (most of the logic is a simple bash if)"""
         # This will only restart the bot if it was running from the launcher script
-        if API.api.is_sender_admin(update): # Use the API to check if sender is admin
+        if self._sender_is_admin(update):  # Use the API to check if sender is admin
             bot.sendMessage(chat_id=update.message.chat_id, text="See ya!")
             os.kill(os.getpid(), signal.SIGKILL)
         else:
@@ -46,8 +67,8 @@ class Commands(object):
 
     def reload_config(self, bot, update):
         """Reload the configuration file."""
-        if API.api.is_sender_admin(update):
-            API.api.config.refresh_config()
+        if self._sender_is_admin(update):
+            self.hyphanrefresh_config()
             bot.sendMessage(chat_id=update.message.chat_id,
                             text="Configuration file reloaded.")
         else:
@@ -67,24 +88,18 @@ class Commands(object):
 
 class Dispatch(object):
     """Define the commands"""
-    def __init__(self, api, updater):
-        self.api = api
+    def __init__(self, hyphan_api, updater):
+        self.hyphan_api = hyphan_api
         self.updater = updater
         self.define_commands()
-        self.set_api()
-
-    def set_api(self):
-        """Set the global variable API for use inside of the program logic as well."""
-        global API
-        API = self.api
 
     def define_commands(self):
         """Bind the commands"""
         dispr = self.updater.dispatcher
-        cods = Commands()
+        cods = Commands(self.hyphan_api)
 
         dispr.add_handler(CommandHandler("quit", cods.quit))
         dispr.add_handler(CommandHandler("restart", cods.restart))
         dispr.add_handler(CommandHandler("reloadconf", cods.reload_config))
         dispr.add_handler(CommandHandler("reconf", cods.reload_config))
-        self.api.add_message_handler([Filters.text], cods.noslash)
+        self.hyphan_api.add_message_handler([Filters.text], cods.noslash)

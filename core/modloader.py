@@ -1,28 +1,25 @@
-'''
-This file is part of Hyphan.
-Hyphan is free software: you can redistribute it and/or modify
-it under the terms of the GNU Afferno General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Hyphan is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Afferno General Public License for more details.
-
-You should have received a copy of the GNU Afferno General Public
-License along with Hyphan.  If not, see
-https://www.gnu.org/licenses/agpl-3.0.html>.
-'''
+# This file is part of Hyphan.
+# Hyphan is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Afferno General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Hyphan is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Afferno General Public License for more details.
+#
+# You should have received a copy of the GNU Afferno General Public
+# License along with Hyphan.  If not, see
+# https://www.gnu.org/licenses/agpl-3.0.html>.
 
 from importlib.machinery import SourceFileLoader
 from os.path import expanduser
-from constants import HYPHAN_DIR
 
 import os
 import pathlib
 
-def get_mods(logger):
+def get_mods(logger, hyphan_dir):
     """
     Gets and loads mods from the modules directory.
     """
@@ -30,10 +27,11 @@ def get_mods(logger):
     main_module = "main"
     mods = []
     paths = [
-        HYPHAN_DIR + "/modules",
-        HYPHAN_DIR + "/opt",
+        hyphan_dir + "/modules",
+        hyphan_dir + "/opt",
         home + "/.hyphan/mods",
-        home + "/.config/hyphan/mods"]
+        home + "/.config/hyphan/mods"
+    ]
 
     for path in paths:
         if not pathlib.Path(path).exists():
@@ -41,11 +39,12 @@ def get_mods(logger):
 
         possible_mods = os.listdir(path)
 
-        for mod in possible_mods: # iterate through the list
-            if mod == "__pycache__" or mod[-1] == "~": # ignore backup files
+        for mod in possible_mods:  # iterate through the list
+            # ignore backup files
+            if mod == "__pycache__" or mod[-1] == "~" or mod == "__init__":
                 continue
 
-            main_module = "main" # Reset the variable to "main" for every loop
+            main_module = "main"  # Reset the variable to "main" for every loop
             mod_name = mod
             location = os.path.join(path, mod)
 

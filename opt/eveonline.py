@@ -19,6 +19,9 @@ from telegram.ext import CommandHandler
 
 class Commands(object):
     """The logic of the hyphan commands"""
+    def __init__(self, api):
+        self.api = api
+
     eveapi.set_user_agent("eveapi.py/1.3")
     eveAPI = eveapi.EVEAPIConnection()
     # the following is a plugin which keeps tracks and reports when a EVE
@@ -38,11 +41,11 @@ class Commands(object):
 
     def characters(self):
         """Returns a dict with the characters defined in the configuration file"""
-        characters = API.get_config("characters").split()
+        characters = self.api.get_config("characters").split()
         character_dict = {}
 
         for character in characters:
-            character_config = API.get_config("character." + character)
+            character_config = self.api.get_config("character." + character)
             character_dict[character] = character_config
 
         return character_dict
@@ -55,7 +58,7 @@ class Commands(object):
             bot.sendMessage(chat_id=update.message.chat_id, text="Please specify a character " \
                             "of whom you want to check the balance of.")
         elif ''.join(args).lower() == "all":
-            characterslist = API.get_config("characters").split()
+            characterslist = self.api.get_config("characters").split()
 
             for character in characterslist:
                 self.balance(bot, update, character)
@@ -74,22 +77,14 @@ class Commands(object):
                 bot.sendMessage(chat_id=update.message.chat_id, text="{0} has {1} ISK"\
                                 .format(character.name, '{0:,}'.format(isk)))
 
-class Dispatcher(object):
+class Dispatch(object):
     """Set the metadata for the hyphan commands"""
-
     def __init__(self, api, updater):
+        self.api = api
         self.updater = updater
         self.set_config()
         self.define_commands()
         self.define_help()
-        self.set_api(self.api)
-
-    def set_api(self, temp):
-        """A simple function to avoid using arcane variable names"""
-        global API
-        API = temp
-        self.api = API
-
 
     def set_config(self):
         """Set values when they are not found in the configuration file"""
@@ -104,7 +99,7 @@ class Dispatcher(object):
     def define_commands(self):
         """Bind the commands"""
         dispr = self.updater.dispatcher
-        cods = Commands()
+        cods = Commands(self.api)
 
         dispr.add_handler(CommandHandler("evealliance", cods.getalliances))
         dispr.add_handler(CommandHandler("evechar", cods.characters))

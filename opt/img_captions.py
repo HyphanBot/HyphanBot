@@ -51,6 +51,7 @@ class ImageCaptions(object):
         ]
         self.inline_engine.show_results(update.inline_query.id, results)
 
+
 class Dispatch(object):
     """
     Dispatchs commands and queries to Telegram.
@@ -61,16 +62,15 @@ class Dispatch(object):
         updater (telegram.ext.Updater): The Updater object used to dispatch the
             commands and other handlers.
     """
-    def __init__(self, mod, updater):
-        self.mod = mod
-        self.updater = updater
-        self.inline_engine = self.mod.api.inline_engine
+    def __init__(self, api, updater):
+        updater = updater
+        inline_engine = api.inline_engine
 
-        img_cap = ImageCaptions(self.inline_engine)
+        img_cap = ImageCaptions(inline_engine)
 
-        disp = self.updater.dispatcher
+        disp = updater.dispatcher
         # TODO: Add traditional command processing
         # TODO: Add custom image commands
         # TODO: Add online image search abilities
 
-        mod.add_inline_query("ImageCaptions", img_cap.inline_handle)
+        api.add_inline_query("ImageCaptions", img_cap.inline_handle)

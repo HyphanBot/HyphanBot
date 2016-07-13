@@ -19,6 +19,9 @@ import telegram.ext as telegram
 
 # project specific
 from core import (configurator, dispatcher, api, inline_engine)
+from core.constants import HYPHAN_DIR
+
+sys.path.append(HYPHAN_DIR)
 
 # Log everything
 class Filter(logging.Filter):
@@ -36,7 +39,7 @@ class Filter(logging.Filter):
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s [%(levelname)s]: %(message)s',
-    level=logging.INFO) # change this to logging.DEBUG to enable verbose mode
+    level=logging.INFO)  # change this to logging.DEBUG to enable verbose mode
 
 logger = logging.getLogger(__name__)
 
@@ -65,8 +68,7 @@ def start_bot(tracestack=False):
     get_bot = updater.bot.getMe()
 
     inline = inline_engine.InlineEngine(updater)
-    hyphan_api = api.HyphanAPI(updater, config, inline)
-    sys.path.append(hyphan_api.hyphan_directory)
+    hyphan_api = api.HyphanAPI(updater=updater, config=config, inline_engine=inline_engine)
 
     # Dispatch modules
     dp = updater.dispatcher

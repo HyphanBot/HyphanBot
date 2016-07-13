@@ -1,24 +1,22 @@
-'''
-This file is part of Hyphan.
-
-Hyphan is free software: you can redistribute it and/or modify
-it under the terms of the GNU Afferno General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Hyphan is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Afferno General Public License for more details.
-
-You should have received a copy of the GNU Afferno General Public
-License along with Hyphan.  If not, see
-https://www.gnu.org/licenses/agpl-3.0.html>.
-'''
+# This file is part of Hyphan.
+# 
+# Hyphan is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Afferno General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# Hyphan is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Afferno General Public License for more details.
+# 
+# You should have received a copy of the GNU Afferno General Public
+# License along with Hyphan.  If not, see
+# https://www.gnu.org/licenses/agpl-3.0.html>.
 import logging
 import uuid
 
-import handlers
+import core.handlers
 
 from telegram.ext import InlineQueryHandler, CallbackQueryHandler
 from telegram import (
@@ -71,7 +69,7 @@ class InlineEngine(object):
         self.return_inline = InlineKeyboardButton("Start using the inline feature!", switch_inline_query="")
 
         self.add_feature("default", self.default_inline_query, True)
-        updater.dispatcher.add_handler(handlers.StartHandler("inline", self.engine_settings))
+        updater.dispatcher.add_handler(core.handlers.StartHandler("inline", self.engine_settings))
         updater.dispatcher.add_handler(CallbackQueryHandler(self.handle_keyboard_query))
 
     def default_inline_query(self, bot, update):
