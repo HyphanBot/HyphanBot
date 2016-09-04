@@ -13,45 +13,50 @@
 # License along with Hyphan.  If not, see
 # https://www.gnu.org/licenses/agpl-3.0.html>.
 
-from core.constants import HYPHAN_DIR
-from core.modloader import *
+from core.modloader import get_mods, load_mod
 import logging
 import traceback
 
+
 def load_modules(api, updater, tracestack=False):
-    """
-    Loads and runs HyphanBot's mods.
+    """ Loads and runs HyphanBot's mods. 
+
+    :param api: The Hyphan api.
+    :param updater: The information from the last message.
+    :param tracestack: Debugging information
     """
     logger = logging.getLogger(__name__)
     # Get, load, and dispatch all mods found in the modules folder
     mod_id = 0
-    for i in get_mods(logger, api.hyphan_directory):
+    for i in get_mods(logger, api):
         # Check if mod is enabled in config. If so, call its dispatch().
         # It's enabled by default.
         # This does some weird shenanigans.
         try:
-            value = api.in_config(value="yes", key="enabled", section=i['name'])
-            mod = load_mod(i)
-            logger.info("Mod {mod} has been loaded.".format(mod=i['name']))
             api.mod_id = mod_id
             api.name = __name__
-            function = (mod.Dispatch if "Dispatch" in dir(mod) else mod.dispatch)
+            value = api.in_config(value="yes", key="enabled",
+                                  section=i['name'])
+
+            mod = load_mod(i)
+            logger.info("Mod {mod} has been loaded.".format(mod=i['name']))
+
+            function = (mod.Dispatch if "Dispatch" in dir(mod) else
+                        mod.dispatch)
             function(api, updater) if value else None
         except KeyError:
             logger.warning("Mod {mod} is disabled.".format(mod=i['name']))
         except TypeError:
-            logger.error("Invalid value for in_config")
-            print(traceback.format_exc())
+            logger.error("Can't find the value for %s in the config."
+                         % i['name'])
         except ImportError as e:
             logger.error("ImportError in mod '%s': %s" % (i['name'], str(e)))
-            if tracestack:
-                print(traceback.format_exc())
         except Exception as e:
             logger.error("Error in mod '%s': %s" % (i['name'], str(e)))
-            print(traceback.format_exc())
         except AttributeError:
             logger.error("Error in mod '%s': dispatch not found" % str(e))
         except:
             logger.error("Cannot load mod %s." % i['name'])
+        finally:
             if tracestack:
                 print(traceback.format_exc())

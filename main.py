@@ -24,10 +24,13 @@ from core.constants import HYPHAN_DIR
 sys.path.append(HYPHAN_DIR)
 
 # Log everything
+
+
 class Filter(logging.Filter):
     """
     filter for the stupid shit python-telegram-bot reports
     """
+
     def filter(self, record):
         message = record.getMessage()
         if message == "No new updates found.":
@@ -39,6 +42,7 @@ class Filter(logging.Filter):
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s [%(levelname)s]: %(message)s',
+    datefmt='%I:%M (%d/%y)',
     level=logging.INFO)  # change this to logging.DEBUG to enable verbose mode
 
 logger = logging.getLogger(__name__)
@@ -49,14 +53,17 @@ telegramlog = logging.getLogger("telegram.bot")
 telegramlog.addFilter(Filter())
 mainlog.addFilter(Filter())
 
+
 def error(bot, update, error):
     """ Error handler for updates """
     logger.warning('Error occured in update, "%s": %s' % (update, error))
     try:
-        notify2.Notification("Error occured in update '%s': '%s'" % (update, error))
+        notify2.Notification(
+            "Error occured in update '%s': '%s'" % (update, error))
     except:
         # Go along as if nothing ever happened...
         pass
+
 
 def start_bot(tracestack=False):
     """ HyphanBot's entry point ('__main__' function call) """
@@ -64,11 +71,14 @@ def start_bot(tracestack=False):
     config = configurator.Configurator()
     generalconfig = config.parse_general()
 
-    updater = telegram.Updater(generalconfig['token'], workers=10)
+    updater = telegram.Updater(generalconfig['token'],
+                               workers=10)
     get_bot = updater.bot.getMe()
 
     inline = inline_engine.InlineEngine(updater)
-    hyphan_api = api.HyphanAPI(updater=updater, config=config, inline_engine=inline_engine)
+    hyphan_api = api.HyphanAPI(updater=updater,
+                               config=config,
+                               inline_engine=inline_engine)
 
     # Dispatch modules
     dp = updater.dispatcher
@@ -90,7 +100,8 @@ def start_bot(tracestack=False):
     except:
         logger.error("X11 or Dbus isn't running")
 
-    logger.info("Initialized %s (%s)." % (get_bot.first_name, get_bot.username))
+    logger.info("Initialized %s (%s)." %
+                (get_bot.first_name, get_bot.username))
 
     updater.idle()
 

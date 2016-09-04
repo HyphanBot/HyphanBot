@@ -22,7 +22,7 @@ from telegram.ext import CommandHandler, Filters
 
 
 class Commands(object):
-    """Define the program logic for the module"""    
+    """Define the program logic for the module"""
     def __init__(self, api):
         self.api = api
 
@@ -36,7 +36,7 @@ class Commands(object):
         """Return an about me message"""
         # TODO: Get text and other settings from config
         bot.sendMessage(chat_id=update.message.chat_id,
-                        text="I am King %s, ruler of thenorthern part of the galaxy."
+                        text="I am King %s, ruler of the northern part of the galaxy."
                         % bot.getMe().first_name)
 
     def anti_nick(self, bot, update):
@@ -44,9 +44,10 @@ class Commands(object):
         msg = update.message.text.lower()
 
         if msg[len(msg) - 2:] == ".." and msg[len(msg) - 3:] != "...":
-            bot.sendMessage(chat_id=update.message.chat_id, text="Three dots, Nick.")
+            bot.sendMessage(chat_id=update.message.chat_id,
+                            text="Three dots, Nick.")
 
-    def noslash(self, bot, update, args):
+    def noslash(self, bot, update):
         """Run a commands based on a string or word instead of a command"""
         msg = update.message.text
         if msg == "help":
@@ -79,6 +80,6 @@ class Dispatch(object):
 
     def define_help(self):
         """Define the help messages"""
-        self.api.set_help("help", "Gets help for a specified command:\n/help [command name]")
+        self.api.set_help("help", "Gets help for a specified command:\n/help"
+                          " [command name]")
         self.api.set_help("about", "A message of our great leader:\n/about")
-

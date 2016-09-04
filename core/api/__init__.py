@@ -41,6 +41,13 @@ class HyphanAPI(Mod, Configuration):
 #        super().__init__(updater=updater, inline_engine=inline_engine, config=config)
         self.updater = updater
 
+    def __eq__(self, other):
+        return self.updater == other.updater
+
+    def __str__(self):
+        return "<API to communicate with Hyphan registered to {}>".format(
+            updater.bot.getMe().username)
+    
     def get_updater(self):
         """ Returns the active Updater object """
         return self.updater
